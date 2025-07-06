@@ -379,9 +379,11 @@ function( setupTargetForPlatform projectName architecture )
             set_property( TARGET ${projectName} PROPERTY MACOSX_RPATH false )
             set_property( TARGET ${projectName} PROPERTY XCODE_ATTRIBUTE_OTHER_CFLAGS[arch=i386]           "${XCODE_ATTRIBUTE_CFLAGS_i386}   $(OTHER_CFLAGS)"         )
             set_property( TARGET ${projectName} PROPERTY XCODE_ATTRIBUTE_OTHER_CFLAGS[arch=x86_64]         "${XCODE_ATTRIBUTE_CFLAGS_x86_64} $(OTHER_CFLAGS)"         )
+            set_property( TARGET ${projectName} PROPERTY XCODE_ATTRIBUTE_OTHER_CFLAGS[arch=arm64]          "${XCODE_ATTRIBUTE_CFLAGS_arm64}  $(OTHER_CFLAGS)"         )
             #...mrmlj...kill the duplication...
             set_property( TARGET ${projectName} PROPERTY XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[arch=i386]   "${XCODE_ATTRIBUTE_CFLAGS_i386}   $(OTHER_CPLUSPLUSFLAGS)" )
             set_property( TARGET ${projectName} PROPERTY XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[arch=x86_64] "${XCODE_ATTRIBUTE_CFLAGS_x86_64} $(OTHER_CPLUSPLUSFLAGS)" )
+            set_property( TARGET ${projectName} PROPERTY XCODE_ATTRIBUTE_OTHER_CPLUSPLUSFLAGS[arch=arm64]  "${XCODE_ATTRIBUTE_CFLAGS_arm64}  $(OTHER_CPLUSPLUSFLAGS)" )
 
             if ( LE_SDK_BUILD )
                 set_property( TARGET ${projectName} PROPERTY XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY libc++ )
@@ -392,7 +394,7 @@ function( setupTargetForPlatform projectName architecture )
                 #...mrmlj...however current code does not compile with the old libstdc++ from SL so libc++/10.7 has to be used...
                 #set_property( TARGET ${projectName} PROPERTY XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET[arch=x86_64] 10.7   )
                 #set_property( TARGET ${projectName} PROPERTY XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY[arch=x86_64]        libc++ )
-                set_property( TARGET ${projectName} PROPERTY XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET 10.7   )
+                set_property( TARGET ${projectName} PROPERTY XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET 11.0   )
                 set_property( TARGET ${projectName} PROPERTY XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY        libc++ )
             endif()
         endif()
@@ -907,9 +909,11 @@ elseif ( CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang ) #...m
             if ( LE_TARGET_ARCHITECTURE STREQUAL sse3 )
                 set( XCODE_ATTRIBUTE_CFLAGS_i386   "-msse3  -march=prescott -mtune=core2"  )
                 set( XCODE_ATTRIBUTE_CFLAGS_x86_64 "-mssse3 -march=core2    -mtune=corei7" )
+                set( XCODE_ATTRIBUTE_CFLAGS_arm64  "-mcpu=apple-a12" )
             elseif ( LE_TARGET_ARCHITECTURE STREQUAL sse4.1 )
                 set( XCODE_ATTRIBUTE_CFLAGS_i386   "-msse4.1 -march=core2 -mtune=core2"  )
                 set( XCODE_ATTRIBUTE_CFLAGS_x86_64 "-msse4.1 -march=core2 -mtune=corei7" )
+                set( XCODE_ATTRIBUTE_CFLAGS_arm64  "-mcpu=apple-a12" )
             elseif( DEFINED LE_TARGET_ARCHITECTURE ) #...mrmlj...when buildOptions has to be included before the architecture is set...cleanup...
                 message( FATAL_ERROR "Unknown OSX architecture (${LE_TARGET_ARCHITECTURE})" )
             endif()
@@ -925,14 +929,14 @@ elseif ( CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang ) #...m
             #                                 (25.08.2011.) (Domagoj Saric)
             add_definitions( -DBOOST_MMAP_HEADER_ONLY )
 
-            set( CMAKE_OSX_ARCHITECTURES           "$(ARCHS_STANDARD_32_64_BIT)" CACHE STRING "OSX architectures"     FORCE )
-            set( CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS "$(ARCHS_STANDARD_32_64_BIT)" CACHE STRING "OSX architectures"     FORCE )
+            set( CMAKE_OSX_ARCHITECTURES           "x86_64;arm64"                CACHE STRING "OSX architectures"     FORCE )
+            set( CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS "x86_64 arm64"                CACHE STRING "OSX architectures"     FORCE )
             set( CMAKE_OSX_SYSROOT                 "macosx"                      CACHE STRING "OSX Base SDK"          FORCE ) #"Latest Mac OS X"
             set( CMAKE_OSX_SYSROOT_DEFAULT         ${CMAKE_OSX_SYSROOT}          CACHE STRING "OSX Base SDK default"  FORCE )
             if ( LE_SDK_BUILD )
-                set( CMAKE_OSX_DEPLOYMENT_TARGET   "10.7"                        CACHE STRING "OSX deployment target" FORCE )
-            else() #...mrmlj...in 2013 a lot of people still seemed to be using SL...however current code does not compile with the old libstdc++ from SL so libc++/10.7 has to be used...
-                set( CMAKE_OSX_DEPLOYMENT_TARGET   "10.7"                        CACHE STRING "OSX deployment target" FORCE )
+                set( CMAKE_OSX_DEPLOYMENT_TARGET   "11.0"                        CACHE STRING "OSX deployment target" FORCE )
+            else() #...mrmlj...updated to support Apple Silicon, requiring macOS 11.0 minimum
+                set( CMAKE_OSX_DEPLOYMENT_TARGET   "11.0"                        CACHE STRING "OSX deployment target" FORCE )
             endif()
         endif()
 

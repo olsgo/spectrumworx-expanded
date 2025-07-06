@@ -253,7 +253,7 @@ SpectrumWorxEditor::~SpectrumWorxEditor()
     settings_      = boost::none;
     presetBrowser_ = boost::none;
 
-#if defined( __APPLE__ ) && !defined( __x86_64__ )
+#if defined( __APPLE__ ) && !defined( __x86_64__ ) && !defined( __aarch64__ )
     if ( pCocoaHostWindow_ )
     {
         //...mrmlj...manual detachment seems to be needed after all...otherwise
@@ -262,7 +262,7 @@ SpectrumWorxEditor::~SpectrumWorxEditor()
         // ...reinvestigate...
         detachComponentFromHostWindow( *this, pCocoaHostWindow_ );
     }
-#endif // Apple & Carbon
+#endif // Apple & Carbon (32-bit Intel only)
 }
 
 
@@ -284,18 +284,18 @@ void SpectrumWorxEditor::attachToHostWindow( HWND const parentWindowHandle )
 
 void SpectrumWorxEditor::attachToHostWindow( ObjC::NSView * const pParentWindow )
 {
-#if !defined( __x86_64__ )
+#if !defined( __x86_64__ ) && !defined( __aarch64__ )
     pCocoaHostWindow_ = nullptr;
 #endif
     attachComponentToHostWindow( *this, pParentWindow );
 }
 
-#if !defined( __x86_64__ )
+#if !defined( __x86_64__ ) && !defined( __aarch64__ )
 void SpectrumWorxEditor::attachToHostWindow( WindowRef const parentWindow )
 {
     pCocoaHostWindow_ = attachComponentToHostWindow( *this, parentWindow );
 }
-#endif // 32 bit only Carbon support
+#endif // Carbon support only for 32-bit Intel
 #endif // platform
 
 
