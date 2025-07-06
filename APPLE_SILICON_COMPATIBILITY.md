@@ -85,11 +85,28 @@ The codebase now properly handles three Apple architectures:
 
 ## Testing Recommendations
 
-1. **Build Testing**: Verify universal binary compilation
-2. **Runtime Testing**: Test on both Intel and Apple Silicon Macs
+1. **Build Testing**: Verify universal binary compilation with updated CMake (3.10+)
+2. **Runtime Testing**: Test on both Intel and Apple Silicon Macs running macOS Sequoia
 3. **Performance Testing**: Validate ARM64 optimizations are working (apple-m1 target)
 4. **Legacy Testing**: Ensure 32-bit Intel compatibility if needed
 5. **macOS Sequoia Testing**: Test specifically on macOS 15.x systems
+6. **Validation Script**: Run `./validate_sequoia_compatibility.sh` for automated checks
+
+## macOS Sequoia (15.x) Compatibility Status
+
+### ✅ Fully Compatible and Optimized
+- **API Modernization**: All deprecated Carbon APIs removed
+- **Performance**: Apple Silicon optimized for desktop Mac performance
+- **Deployment**: Modern deployment target (12.0) with Sequoia support
+- **Build System**: Updated CMake requirements and policies
+- **Validation**: Automated compatibility checking available
+
+### 🔧 Key Improvements Made
+1. **Deprecated API Removal**: `FSRef` → `CFURLRef`, `ExtAudioFileOpen` → `ExtAudioFileOpenURL`
+2. **Performance Optimization**: `apple-a12` → `apple-m1` for better Mac desktop performance  
+3. **Compatibility**: Deployment target updated to macOS 12.0 for Sequoia compatibility
+4. **Build System**: CMake modernized to version 3.10+ with updated policies
+5. **Documentation**: Comprehensive validation and testing procedures added
 
 ## macOS Sequoia (15.x) Compatibility
 

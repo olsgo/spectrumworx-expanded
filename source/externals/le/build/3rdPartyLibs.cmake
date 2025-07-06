@@ -6,7 +6,7 @@
 #
 ################################################################################
 
-cmake_minimum_required( VERSION 2.8.12 )
+cmake_minimum_required( VERSION 3.10 )  # Updated for macOS Sequoia compatibility
 
 include( "${CMAKE_CURRENT_LIST_DIR}/utilities.cmake" )
 

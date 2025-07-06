@@ -6,7 +6,7 @@
 #
 ################################################################################
 
-cmake_minimum_required( VERSION 3.1 )
+cmake_minimum_required( VERSION 3.10 )  # Updated for macOS Sequoia compatibility
 
 include( "${CMAKE_CURRENT_LIST_DIR}/3rdPartyLibs.cmake" )
 include( "${CMAKE_CURRENT_LIST_DIR}/utilities.cmake"    )

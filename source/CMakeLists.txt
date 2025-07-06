@@ -7,10 +7,10 @@
 ################################################################################
 
 
-cmake_minimum_required( VERSION 3.5 )
+cmake_minimum_required( VERSION 3.10 )  # Updated for macOS Sequoia compatibility
 
-# http://www.cmake.org/cmake/help/v3.0/policy/CMP0043.html
-cmake_policy( SET CMP0043 OLD )
+# Updated for macOS Sequoia compatibility - use modern CMake policies
+cmake_policy( SET CMP0043 NEW )
 
 set( LE_SW_EDITION_SUFFIX         ""    CACHE STRING "SW project name suffix"              )
 set( LE_SW_INCLUDED_EFFECTS       "all" CACHE STRING "list of included effects (or 'all')" )
