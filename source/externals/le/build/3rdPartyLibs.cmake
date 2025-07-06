@@ -27,7 +27,8 @@ function( add3rdPartyLib name minimumVersion downloadVersion downloadURL downloa
         set( LE_3rdParty_root "$ENV{LEB_3rdParty_root}" CACHE FILE "root path for 3rd party libraries" )
     endif()
     if ( NOT LE_3rdParty_root )
-        set( LE_3rdParty_root "${PROJECT_SOURCE_DIR}/3rdParty" )
+        # Default to the repository's bundled libraries.
+        set( LE_3rdParty_root "${PROJECT_SOURCE_DIR}/../3rd_party" )
     endif()
 
     # http://www.cmake.org/pipermail/cmake/2007-January/012519.html
