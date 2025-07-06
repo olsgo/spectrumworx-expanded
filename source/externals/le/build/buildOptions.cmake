@@ -502,15 +502,20 @@ elseif( iOS )
     )
     set( LEB_OS_SUFFIX iOS CACHE INTERNAL "" FORCE )
 elseif( APPLE )
-    #...mrmlj...perhaps we can default to sse4.1 for 64bit builds...investigate...
-    # http://www.cnet.com/news/older-64-bit-macs-out-of-the-picture-for-mountain-lion
-    # http://www.everymac.com/mac-answers/snow-leopard-mac-os-x-faq/mac-os-x-snow-leopard-64-bit-macs-64-bit-efi-boot-in-64-bit-mode.html
-    # http://en.wikipedia.org/wiki/List_of_Macintosh_models_grouped_by_CPU_type
-    set( LEB_ARCHITECTURES
-        "sse3,x86-32_SSE3+x86-64_SSSE3"
-        "sse4.1,x86-32_SSE4.1+x86-64_SSE4.1"
-        CACHE INTERNAL "" FORCE
-    )
+    # Support modern Apple silicon machines.
+    if( CMAKE_SYSTEM_PROCESSOR MATCHES "arm64" OR CMAKE_OSX_ARCHITECTURES MATCHES "arm64" )
+        set( LEB_ARCHITECTURES
+            "arm64,ARM64"
+            CACHE INTERNAL "" FORCE
+        )
+    else()
+        # Legacy Intel architectures.
+        set( LEB_ARCHITECTURES
+            "sse3,x86-32_SSE3+x86-64_SSSE3"
+            "sse4.1,x86-32_SSE4.1+x86-64_SSE4.1"
+            CACHE INTERNAL "" FORCE
+        )
+    endif()
     set( LEB_OS_SUFFIX OSX CACHE INTERNAL "" FORCE )
 elseif ( WIN32 )
     #...mrmlj...ABI abstraction to be rethought & finished...see createSDKProjectAux() in sdkProject.cmake...

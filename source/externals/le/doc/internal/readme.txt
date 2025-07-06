@@ -4,7 +4,7 @@
 Little Endian Build main documentation.
 ---------------------------------------
 
-  Copyright © 2009 - 2016. Little Endian Ltd. All rights reserved.
+  Copyright Â© 2009 - 2016. Little Endian Ltd. All rights reserved.
 
 ================================================================================
 
@@ -54,10 +54,10 @@ Contents:
         * They can optionaly configure it using the LE_CHECKED_BUILD macro (see
           the header for more details).
 
-    * All 3rd party libraries should be placed in a single folder and an
-      environment variable, named "LEB_3rdParty_root", that points to that
-      folder should be created. The path must use forward slashes and not
-      include the trailing slash.
+    * All 3rd party libraries should be placed in a single folder.
+      The build searches in the repository's `3rd_party` directory by default.
+      Set the `LEB_3rdParty_root` environment variable to use an alternative
+      location; the path must use forward slashes and omit the trailing slash.
     * Some projects may require an additional environment variable,
       named "LEB_root", that points to the root of the LEB folder structure
       (such that ${LEB_root}/doc/trunk/internal/readme.txt points to this

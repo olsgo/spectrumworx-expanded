@@ -47,7 +47,28 @@ project( ${LE_PROJECT_NAME} )
 
 include( ${CMAKE_SOURCE_DIR}/core/configuration.cmake )
 
-include( "$ENV{LEB_3rdParty_root}/juce/trunk/juce.cmake" )
+# Use bundled 3rd party libraries unless overridden by an environment variable.
+if( NOT DEFINED ENV{LEB_3rdParty_root} )
+    set( ENV{LEB_3rdParty_root} "${CMAKE_SOURCE_DIR}/../3rd_party" )
+endif()
+# Disable JUCE example and tool builds when using the bundled copy.
+set(JUCE_BUILD_EXTRAS OFF CACHE BOOL "" FORCE)
+set(JUCE_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(JUCE_BUILD_HELPER_TOOLS OFF CACHE BOOL "" FORCE)
+# Use JUCE's modern CMake build system.
+add_subdirectory("$ENV{LEB_3rdParty_root}/JUCE" JUCE-build)
+
+# Minimal helper to link required JUCE modules
+function(addJUCE target)
+    target_link_libraries(${target}
+        PRIVATE
+            juce::juce_core
+            juce::juce_data_structures
+            juce::juce_events
+            juce::juce_graphics
+            juce::juce_gui_basics
+    )
+endfunction()
 
 ############################################################################
 # Source files setup
