@@ -637,7 +637,7 @@ function( setupSDKTool targetName )
             XCODE_ATTRIBUTE_ARCHS                    "x86_64 arm64"
             XCODE_ATTRIBUTE_VALID_ARCHS              "x86_64 arm64"
             XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH         YES
-            XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET 11.0
+            XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET 12.0  # Updated for macOS Sequoia compatibility
             XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY        libc++
         )
         target_link_libraries( ${targetName} "-framework Accelerate -framework CoreServices -framework Foundation" )

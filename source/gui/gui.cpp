@@ -448,26 +448,20 @@ LE_NOALIAS juce::File licencesPath()
 
 
 #ifdef __APPLE__
-::FSRef makeFSRefFromPath( juce::String const & path )
+// Updated for macOS Sequoia compatibility - replacing deprecated FSRef APIs
+::CFURLRef makeCFURLFromPath( juce::String const & path )
 {
-    // FSPathMakeRef broken on relative paths
-    // http://lists.apple.com/archives/carbon-development/2003/Mar/msg00997.html
-    FSRef result;
-    BOOST_VERIFY( ::FSPathMakeRef( reinterpret_cast<UInt8 const *>( path.getCharPointer().getAddress() ), &result, nullptr ) == noErr );
-    return result;
+    ::CFStringRef const pathString( ::CFStringCreateWithCString( nullptr, path.getCharPointer().getAddress(), kCFStringEncodingUTF8 ) );
+    ::CFURLRef    const pathURL   ( ::CFURLCreateWithFileSystemPath( nullptr, pathString, kCFURLPOSIXPathStyle, false ) );
+    BOOST_ASSERT( pathString );
+    BOOST_ASSERT( pathURL );
+    ::CFRelease( pathString );
+    return pathURL;
 }
 
 ::CFURLRef makeCFURLFromPath( juce::File const & path )
 {
-    //::CFStringRef const pathString( ::CFStringCreateWithCStringNoCopy( nullptr, path.getFullPathName().getCharPointer().getAddress(), kCFStringEncodingUTF8, kCFAllocatorNull ) );
-    //::CFURLRef    const pathURL   ( ::CFURLCreateWithFileSystemPath  ( nullptr, pathString, kCFURLPOSIXPathStyle, false ) );
-    //BOOST_ASSERT( pathString );
-    //BOOST_ASSERT( pathURL    );
-    //::CFRelease( pathString );
-    ::FSRef    const pathFSRef( makeFSRefFromPath( path.getFullPathName() )   );
-    ::CFURLRef const pathURL  ( ::CFURLCreateFromFSRef( nullptr, &pathFSRef ) );
-    BOOST_ASSERT( pathURL );
-    return pathURL;
+    return makeCFURLFromPath( path.getFullPathName() );
 }
 #endif // __APPLE__
 

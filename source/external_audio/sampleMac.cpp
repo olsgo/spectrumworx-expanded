@@ -16,7 +16,7 @@ namespace LE
 {
 //------------------------------------------------------------------------------
 
-namespace SW { namespace GUI { FSRef makeFSRefFromPath( juce::String const & path ); } } //...mrmlj...
+namespace SW { namespace GUI { ::CFURLRef makeCFURLFromPath( juce::String const & path ); } } //...mrmlj...
 
 juce::String Sample::supportedFormats()
 {
@@ -43,10 +43,14 @@ namespace
 LE_NOTHROWNOALIAS
 char const * Sample::doLoad( juce::String const & sampleFileName, unsigned int const desiredSampleRate, Sample::DataHolder & data )
 {
-    FSRef const samplePath( SW::GUI::makeFSRefFromPath( sampleFileName ) );
+    // Updated for macOS Sequoia compatibility - using modern ExtAudioFileOpenURL instead of deprecated FSRef
+    ::CFURLRef const sampleURL( SW::GUI::makeCFURLFromPath( sampleFileName ) );
+    if ( !sampleURL )
+        return "Unable to create URL from path.";
 
     ExtAudioFileGuard sampleFile;
-    OSStatus error( ::ExtAudioFileOpen( &samplePath, &sampleFile ) );
+    OSStatus error( ::ExtAudioFileOpenURL( sampleURL, &sampleFile ) );
+    ::CFRelease( sampleURL );
     if ( error != noErr )
         return "Unable to open file.";
 

@@ -223,7 +223,9 @@ LE_NOALIAS        juce::File         licencesPath ();
 
 
 #ifdef __APPLE__
-FSRef makeFSRefFromPath( juce::String const & path );
+// Updated for macOS Sequoia compatibility - using modern CFURLRef instead of deprecated FSRef
+::CFURLRef makeCFURLFromPath( juce::String const & path );
+::CFURLRef makeCFURLFromPath( juce::File const & path );
 #endif // __APPLE__
 
 
