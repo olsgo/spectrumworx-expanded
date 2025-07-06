@@ -6,7 +6,7 @@
 #
 ################################################################################
 
-cmake_minimum_required( VERSION 3.1 )
+cmake_minimum_required( VERSION 3.10 )  # Updated for macOS Sequoia compatibility
 
 include( "${CMAKE_CURRENT_LIST_DIR}/3rdPartyLibs.cmake" )
 include( "${CMAKE_CURRENT_LIST_DIR}/utilities.cmake"    )
@@ -394,7 +394,7 @@ function( setupTargetForPlatform projectName architecture )
                 #...mrmlj...however current code does not compile with the old libstdc++ from SL so libc++/10.7 has to be used...
                 #set_property( TARGET ${projectName} PROPERTY XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET[arch=x86_64] 10.7   )
                 #set_property( TARGET ${projectName} PROPERTY XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY[arch=x86_64]        libc++ )
-                set_property( TARGET ${projectName} PROPERTY XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET 11.0   )
+                set_property( TARGET ${projectName} PROPERTY XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET 12.0   )  # Updated for macOS Sequoia compatibility
                 set_property( TARGET ${projectName} PROPERTY XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY        libc++ )
             endif()
         endif()
@@ -909,11 +909,11 @@ elseif ( CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang ) #...m
             if ( LE_TARGET_ARCHITECTURE STREQUAL sse3 )
                 set( XCODE_ATTRIBUTE_CFLAGS_i386   "-msse3  -march=prescott -mtune=core2"  )
                 set( XCODE_ATTRIBUTE_CFLAGS_x86_64 "-mssse3 -march=core2    -mtune=corei7" )
-                set( XCODE_ATTRIBUTE_CFLAGS_arm64  "-mcpu=apple-a12" )
+                set( XCODE_ATTRIBUTE_CFLAGS_arm64  "-mcpu=apple-m1" )  # Updated for macOS Sequoia - optimized for Mac desktop performance
             elseif ( LE_TARGET_ARCHITECTURE STREQUAL sse4.1 )
                 set( XCODE_ATTRIBUTE_CFLAGS_i386   "-msse4.1 -march=core2 -mtune=core2"  )
                 set( XCODE_ATTRIBUTE_CFLAGS_x86_64 "-msse4.1 -march=core2 -mtune=corei7" )
-                set( XCODE_ATTRIBUTE_CFLAGS_arm64  "-mcpu=apple-a12" )
+                set( XCODE_ATTRIBUTE_CFLAGS_arm64  "-mcpu=apple-m1" )  # Updated for macOS Sequoia - optimized for Mac desktop performance
             elseif( DEFINED LE_TARGET_ARCHITECTURE ) #...mrmlj...when buildOptions has to be included before the architecture is set...cleanup...
                 message( FATAL_ERROR "Unknown OSX architecture (${LE_TARGET_ARCHITECTURE})" )
             endif()
@@ -934,9 +934,9 @@ elseif ( CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang ) #...m
             set( CMAKE_OSX_SYSROOT                 "macosx"                      CACHE STRING "OSX Base SDK"          FORCE ) #"Latest Mac OS X"
             set( CMAKE_OSX_SYSROOT_DEFAULT         ${CMAKE_OSX_SYSROOT}          CACHE STRING "OSX Base SDK default"  FORCE )
             if ( LE_SDK_BUILD )
-                set( CMAKE_OSX_DEPLOYMENT_TARGET   "11.0"                        CACHE STRING "OSX deployment target" FORCE )
-            else() #...mrmlj...updated to support Apple Silicon, requiring macOS 11.0 minimum
-                set( CMAKE_OSX_DEPLOYMENT_TARGET   "11.0"                        CACHE STRING "OSX deployment target" FORCE )
+                set( CMAKE_OSX_DEPLOYMENT_TARGET   "12.0"                        CACHE STRING "OSX deployment target" FORCE )
+            else() #...mrmlj...updated for macOS Sequoia compatibility - macOS 12.0 supports all current hardware
+                set( CMAKE_OSX_DEPLOYMENT_TARGET   "12.0"                        CACHE STRING "OSX deployment target" FORCE )
             endif()
         endif()
 
