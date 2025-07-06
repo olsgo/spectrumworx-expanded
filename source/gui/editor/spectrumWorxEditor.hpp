@@ -143,11 +143,11 @@ public:
     void attachToHostWindow( HWND           parentWindow );
 #elif defined( __APPLE__ )
     void attachToHostWindow( ObjC::NSView * parentWindow );
-    #if !defined( __x86_64__ )
+    #if !defined( __x86_64__ ) && !defined( __aarch64__ )
     void attachToHostWindow( WindowRef      parentWindow );
     //...mrmlj...seems to be needed after all...reinvestigate...
 private: ObjC::NSWindow * pCocoaHostWindow_; public:
-    #endif // !__x86_64__
+    #endif // !(x86_64 || aarch64) - Carbon support only for 32-bit Intel
 #endif // platform
 
 public:
