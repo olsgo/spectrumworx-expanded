@@ -633,11 +633,11 @@ function( setupSDKTool targetName )
     if ( APPLE )
         set_target_properties(
             ${targetName} PROPERTIES
-            OSX_ARCHITECTURES                        x86_64
-            XCODE_ATTRIBUTE_ARCHS                    x86_64
-            XCODE_ATTRIBUTE_VALID_ARCHS              x86_64
+            OSX_ARCHITECTURES                        "x86_64;arm64"
+            XCODE_ATTRIBUTE_ARCHS                    "x86_64 arm64"
+            XCODE_ATTRIBUTE_VALID_ARCHS              "x86_64 arm64"
             XCODE_ATTRIBUTE_ONLY_ACTIVE_ARCH         YES
-            XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET 10.11
+            XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET 11.0
             XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY        libc++
         )
         target_link_libraries( ${targetName} "-framework Accelerate -framework CoreServices -framework Foundation" )

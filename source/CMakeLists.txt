@@ -206,7 +206,7 @@ if ( APPLE )
     add_library( "${LE_PROJECT_NAME}" SHARED ${SOURCES} )
     # Note: For debugging with the auval tool straight from Xcode set:
     # - executable: arch
-    # - arguments: (-i386) auvaltool (-comp) -v aufx SW00 LE00
+    # - arguments: (-x86_64|-arm64) auvaltool (-comp) -v aufx SW00 LE00
     # http://developer.apple.com/library/mac/#technotes/tn2204/_index.html (Audio Unit Validation Using the auval Tool)
     #                                         (15.02.2013.) (Domagoj Saric)
 else()
@@ -359,7 +359,7 @@ elseif ( APPLE )
 
     add_custom_command(
         OUTPUT  "${auComponentManagerCompiledResourceFile}"
-        COMMAND Rez "${auComponentManagerResourceFile}" -d SystemSevenOrLater=1 -useDF -script Roman -d i386_YES -d x86_64_YES -isysroot $(SDKROOT) -o "${auComponentManagerCompiledResourceFile}"
+        COMMAND Rez "${auComponentManagerResourceFile}" -d SystemSevenOrLater=1 -useDF -script Roman -d i386_YES -d x86_64_YES -d arm64_YES -isysroot $(SDKROOT) -o "${auComponentManagerCompiledResourceFile}"
         COMMAND mkdir -p "/${auDirectory}/${LE_PROJECT_NAME}.component/Contents/Resources"
         COMMAND cp "${auComponentManagerCompiledResourceFile}" "/${auDirectory}/${LE_PROJECT_NAME}.component/Contents/Resources/${LE_PROJECT_NAME}.rsrc"
         DEPENDS "${auComponentManagerResourceFile}"
