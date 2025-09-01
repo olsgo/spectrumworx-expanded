@@ -17,7 +17,11 @@
 #include "le/spectrumworx/engine/setup.hpp"
 #include "le/utility/platformSpecifics.hpp"
 
+#ifdef LE_HAS_NT2
 #include "boost/simd/preprocessor/stack_buffer.hpp"
+#else
+#include <vector>
+#endif
 //------------------------------------------------------------------------------
 namespace LE
 {
@@ -71,7 +75,7 @@ void SharperImpl::setup( IndexRange const &, Engine::Setup const & engineSetup )
 // ----------------------
 //
 ////////////////////////////////////////////////////////////////////////////////
-/// \note Alex says: "Smoother and Sharper – applies 1st order lowpass and
+/// \note Alex says: "Smoother and Sharper ï¿½ applies 1st order lowpass and
 ///       highpass filters respectively among the magnitude and/or the phase
 ///       axis. M_smth and p_smth are smooth (or sharp) factors whose values
 ///       range from 0...128 bins. Warning: highly recommend using small
@@ -93,6 +97,7 @@ void SharperImpl::process( Engine::ChannelData_AmPh data, Engine::Setup const & 
     if ( filterLenHalf_ == 0 )
         return;
 
+#ifdef LE_HAS_NT2
     BOOST_SIMD_ALIGNED_SCOPED_STACK_BUFFER( smoothedAmplitudes, Engine::real_t, data.size() );
     Math::symmetricMovingAverage( data.amps(), smoothedAmplitudes, filterLenHalf_ );
 
@@ -101,6 +106,17 @@ void SharperImpl::process( Engine::ChannelData_AmPh data, Engine::Setup const & 
     float const intensity( intensity_ );
     float       * LE_RESTRICT pAmp        ( data.amps().begin()        );
     float const * LE_RESTRICT pSmoothedAmp( smoothedAmplitudes.begin() );
+#else
+    std::vector<Engine::real_t> smoothedAmplitudesVector( data.size() );
+    auto smoothedAmplitudes = boost::make_iterator_range( smoothedAmplitudesVector.data(), smoothedAmplitudesVector.data() + smoothedAmplitudesVector.size() );
+    Math::symmetricMovingAverage( data.amps(), smoothedAmplitudes, filterLenHalf_ );
+
+    // Combine (subtract smoother from original) smoothed amplitudes with original one:
+    float const limit    ( cutoff_    );
+    float const intensity( intensity_ );
+    float       * LE_RESTRICT pAmp        ( data.amps().begin()        );
+    float const * LE_RESTRICT pSmoothedAmp( smoothedAmplitudes.begin() );
+#endif
     while ( pSmoothedAmp != smoothedAmplitudes.end() )
     {
         float       & amp        ( *pAmp++         );

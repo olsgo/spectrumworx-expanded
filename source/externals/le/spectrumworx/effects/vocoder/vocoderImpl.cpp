@@ -70,7 +70,11 @@
 
 #include "boost/range/adaptor/reversed.hpp"
 
+#ifdef LE_HAS_NT2
 #include "boost/simd/preprocessor/stack_buffer.hpp"
+#else
+#include <vector>
+#endif
 
 #include "boost/assert.hpp"
 #include "boost/concept_check.hpp"
@@ -285,8 +289,14 @@ void VocoderImpl::process( Engine::MainSideChannelData_AmPh data, Engine::Setup 
     if ( filterMethod() == FilterMethod::MovingAverage )
     {
         //...mrmlj...probably still broken 'reduced range' operation...
+#ifdef LE_HAS_NT2
         BOOST_SIMD_ALIGNED_SCOPED_STACK_BUFFER( workBuffer, Engine::real_t, fullNumberOfBins );
         lowPassSpectrum_movingAverage( envelope, workBuffer, setup );
+#else
+        std::vector<Engine::real_t> workBufferVector( fullNumberOfBins );
+        auto workBuffer = boost::make_iterator_range( workBufferVector.data(), workBufferVector.data() + workBufferVector.size() );
+        lowPassSpectrum_movingAverage( envelope, workBuffer, setup );
+#endif
     #ifndef NDEBUG //...mrmlj...?...clear out negative values to avoid assertion failures.
         for ( auto & amp : envelope ) { amp = std::max( 0.0f, amp ); }
     #endif // NDEBUG

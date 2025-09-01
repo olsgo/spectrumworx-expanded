@@ -18,6 +18,9 @@ set( LE_SW_FMOD                   false CACHE BOOL   "create FMOD Studio project
 set( LE_SW_COMPILE_TIME_PROFILING false CACHE BOOL   "add compile time profiling targets"  )
 mark_as_advanced( LE_SW_COMPILE_TIME_PROFILING )
 
+# Disable NT2/Boost.SIMD by default to simplify Apple Silicon builds
+option( LE_SW_DISABLE_NT2 "Disable NT2/Boost.SIMD integration" ON )
+
 set( LE_PROJECT_NAME       "SpectrumWorx"                   )
 set( LE_PROJECT_LABEL      "SpectrumWorx"                   )
 
@@ -47,6 +50,11 @@ project( ${LE_PROJECT_NAME} )
 
 include( ${CMAKE_SOURCE_DIR}/core/configuration.cmake )
 
+# Default Apple builds to arm64 (Apple Silicon) unless explicitly set
+if( APPLE AND NOT DEFINED CMAKE_OSX_ARCHITECTURES )
+    set( CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "Target Apple architectures" FORCE )
+endif()
+
 # Use bundled 3rd party libraries unless overridden by an environment variable.
 if( NOT DEFINED ENV{LEB_3rdParty_root} )
     set( ENV{LEB_3rdParty_root} "${CMAKE_SOURCE_DIR}/../3rd_party" )
@@ -69,6 +77,9 @@ function(addJUCE target)
             juce::juce_gui_basics
     )
 endfunction()
+
+# Force-include LE configuration header so LE_IMPL_NAMESPACE_* macros are defined
+addForceInclude(${leExternals}/build/leConfigurationAndODRHeader.h)
 
 ############################################################################
 # Source files setup
@@ -172,7 +183,7 @@ source_group("Externals\\License" FILES ${SOURCES_Externals__License})
           ${leExternals}/plugins/au/plugin.inl
           ${leExternals}/plugins/au/properties.hpp
           ${leExternals}/plugins/au/resources.r
-          ${leExternals}/plugins/au/resources.rsrc
+          # Temporarily disabled: ${leExternals}/plugins/au/resources.rsrc
         )
         source_group("Externals\\Plugins\\AU" FILES ${SOURCES_Externals__Plugins__AU})
     endif()
@@ -217,9 +228,91 @@ set_property( TARGET "${LE_PROJECT_NAME}" PROPERTY PROJECT_LABEL "${LE_PROJECT_L
 
 include_directories(
     AFTER
-    "$ENV{LEB_3rdParty_root}/RapidXML/1.13"
+    "$ENV{LEB_3rdParty_root}/RapidXML/1.13/rapidxml-1.13"
 )
 add_definitions( -DLEB_PRECOMPILE_RapidXML )
+
+# Loris/SDIF integration (configurable)
+option( LE_SW_ENABLE_LORIS "Enable Loris spectral analysis integration" ON )
+set( LORIS_ROOT "" CACHE PATH "Root of Loris installation (optional)" )
+set( SDIF_ROOT  "" CACHE PATH "Root of SDIF installation (optional)"  )
+
+set( LORIS_INCLUDE_DIR "" )
+set( LORIS_LIBRARY     "" )
+set( SDIF_INCLUDE_DIRS "" )
+set( SDIF_LIBRARY      "" )
+
+if( LE_SW_ENABLE_LORIS )
+    # Try to locate Loris headers and library
+    if( LORIS_ROOT )
+        list( APPEND CMAKE_PREFIX_PATH "${LORIS_ROOT}" )
+    endif()
+    find_path( LORIS_INCLUDE_DIR NAMES loris.h
+        HINTS
+            ${LORIS_ROOT}/include
+            ${LORIS_ROOT}/src
+        PATH_SUFFIXES include src
+    )
+    # lib name may be libloris.a or loris (static/dynamic)
+    find_library( LORIS_LIBRARY NAMES loris libloris
+        HINTS
+            ${LORIS_ROOT}/build
+            ${LORIS_ROOT}/lib
+            ${LORIS_ROOT}
+        PATH_SUFFIXES lib build
+    )
+
+    # Fallbacks if the above find_* didn't locate things but LORIS_ROOT looks standard
+    if( NOT LORIS_INCLUDE_DIR )
+        if( EXISTS "${LORIS_ROOT}/include/loris.h" )
+            set( LORIS_INCLUDE_DIR "${LORIS_ROOT}/include" CACHE PATH "Loris include" FORCE )
+        endif()
+    endif()
+    if( NOT LORIS_LIBRARY )
+        if( EXISTS "${LORIS_ROOT}/build/libloris.a" )
+            set( LORIS_LIBRARY "${LORIS_ROOT}/build/libloris.a" CACHE FILEPATH "Loris library" FORCE )
+        elseif( EXISTS "${LORIS_ROOT}/lib/libloris.a" )
+            set( LORIS_LIBRARY "${LORIS_ROOT}/lib/libloris.a" CACHE FILEPATH "Loris library" FORCE )
+        endif()
+    endif()
+
+    # SDIF is optional but recommended for Loris SDIF IO
+    if( SDIF_ROOT )
+        list( APPEND CMAKE_PREFIX_PATH "${SDIF_ROOT}" )
+    endif()
+    # SDIF headers are sometimes under include/ and sdif/
+    find_path( SDIF_INCLUDE_MAIN NAMES sdif.h SDIF.h
+        HINTS ${SDIF_ROOT}/include ${SDIF_ROOT}/sdif
+        PATH_SUFFIXES include sdif
+    )
+    if( SDIF_INCLUDE_MAIN )
+        list( APPEND SDIF_INCLUDE_DIRS "${SDIF_INCLUDE_MAIN}" )
+    endif()
+    find_library( SDIF_LIBRARY NAMES sdif libsdif
+        HINTS ${SDIF_ROOT}/lib ${SDIF_ROOT}
+        PATH_SUFFIXES lib
+    )
+    if( NOT SDIF_LIBRARY )
+        if( EXISTS "${SDIF_ROOT}/lib/libsdif.dylib" )
+            set( SDIF_LIBRARY "${SDIF_ROOT}/lib/libsdif.dylib" CACHE FILEPATH "SDIF library" FORCE )
+        elseif( EXISTS "${SDIF_ROOT}/lib/libsdif.a" )
+            set( SDIF_LIBRARY "${SDIF_ROOT}/lib/libsdif.a" CACHE FILEPATH "SDIF library" FORCE )
+        endif()
+    endif()
+
+    if( LORIS_INCLUDE_DIR AND LORIS_LIBRARY )
+        message( STATUS "Loris found: include at ${LORIS_INCLUDE_DIR}, lib at ${LORIS_LIBRARY}" )
+        include_directories( "${LORIS_INCLUDE_DIR}" )
+        add_definitions( -DLE_SW_LORIS_ENGINE=1 -DLORIS_HAVE_M_PI )
+        if( SDIF_INCLUDE_DIRS )
+            include_directories( ${SDIF_INCLUDE_DIRS} )
+            add_definitions( -DSDIF_HAS_STDINT_H )
+        endif()
+    else()
+        message( WARNING "Loris not found. Disable with -DLE_SW_ENABLE_LORIS=OFF or set LORIS_ROOT/paths." )
+        set( LE_SW_ENABLE_LORIS OFF CACHE BOOL "Enable Loris spectral analysis integration" FORCE )
+    endif()
+endif()
 
 
 if ( LE_SW_FMOD )
@@ -271,7 +364,10 @@ target_compile_options( ${LE_PROJECT_NAME} PRIVATE $<$<CONFIG:Debug>:${rttiOnSwi
 setupTargetForPlatform( ${LE_PROJECT_NAME} ${LE_TARGET_ARCHITECTURE} )
 
 addJUCE( "${LE_PROJECT_NAME}" )
-addNT2()
+# Temporarily disable NT2 during Loris integration to avoid build issues
+if( NOT DEFINED LE_SW_DISABLE_NT2 OR NOT LE_SW_DISABLE_NT2 )
+    addNT2()
+endif()
 addPCH( "${LE_PROJECT_NAME}" ${leExternals}/build/precompiledHeaders )
 
 if ( MSVC )
@@ -318,7 +414,10 @@ if ( MSVC )
 
 elseif ( APPLE )
 
-    appendProperty( ${LE_PROJECT_NAME} COMPILE_FLAGS "${x86CompilerSwitches}" )
+    # Only apply x86-specific flags when targeting x86 architectures
+    if ( LE_TARGET_ARCHITECTURE MATCHES "^(sse3|sse4\.1|x86_64|i386)$" )
+        appendProperty( ${LE_PROJECT_NAME} COMPILE_FLAGS "${x86CompilerSwitches}" )
+    endif()
 
     set( CMAKE_XCODE_ATTRIBUTE_MACH_O_TYPE       "mh_dylib" CACHE STRING "" FORCE )
     set( CMAKE_XCODE_ATTRIBUTE_EXECUTABLE_PREFIX ""         CACHE STRING "" FORCE )
@@ -357,13 +456,14 @@ elseif ( APPLE )
         @ONLY
     )
 
-    add_custom_command(
-        OUTPUT  "${auComponentManagerCompiledResourceFile}"
-        COMMAND Rez "${auComponentManagerResourceFile}" -d SystemSevenOrLater=1 -useDF -script Roman -d i386_YES -d x86_64_YES -d arm64_YES -isysroot $(SDKROOT) -o "${auComponentManagerCompiledResourceFile}"
-        COMMAND mkdir -p "/${auDirectory}/${LE_PROJECT_NAME}.component/Contents/Resources"
-        COMMAND cp "${auComponentManagerCompiledResourceFile}" "/${auDirectory}/${LE_PROJECT_NAME}.component/Contents/Resources/${LE_PROJECT_NAME}.rsrc"
-        DEPENDS "${auComponentManagerResourceFile}"
-    )
+    # Temporarily disable AU resource compilation for macOS Sequoia compatibility
+    # add_custom_command(
+    #     OUTPUT  "${auComponentManagerCompiledResourceFile}"
+    #     COMMAND Rez "${auComponentManagerResourceFile}" -d SystemSevenOrLater=1 -useDF -script Roman -d i386_YES -d x86_64_YES -d arm64_YES -isysroot $(SDKROOT) -o "${auComponentManagerCompiledResourceFile}"
+    #     COMMAND mkdir -p "/${auDirectory}/${LE_PROJECT_NAME}.component/Contents/Resources"
+    #     COMMAND cp "${auComponentManagerCompiledResourceFile}" "/${auDirectory}/${LE_PROJECT_NAME}.component/Contents/Resources/${LE_PROJECT_NAME}.rsrc"
+    #     DEPENDS "${auComponentManagerResourceFile}"
+    # )
 
     # Create symlinks to/for the current build configuration
     add_custom_command(
@@ -382,11 +482,22 @@ set_target_properties( ${LE_PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY "$
 
 if ( APPLE )
     target_link_libraries( ${LE_PROJECT_NAME}
+        PRIVATE
         "-framework Accelerate"
         "-framework AudioToolbox"
         "-framework AudioUnit"
         "-framework CoreFoundation"
     )
+endif()
+
+# Link Loris/SDIF if enabled and found
+if( LE_SW_ENABLE_LORIS )
+    if( LORIS_LIBRARY )
+        target_link_libraries( ${LE_PROJECT_NAME} PRIVATE ${LORIS_LIBRARY} )
+    endif()
+    if( SDIF_LIBRARY )
+        target_link_libraries( ${LE_PROJECT_NAME} PRIVATE ${SDIF_LIBRARY} )
+    endif()
 endif()
 
 

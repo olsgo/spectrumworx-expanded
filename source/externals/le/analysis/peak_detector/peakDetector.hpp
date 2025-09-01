@@ -249,8 +249,8 @@ private:
 
     std::uint8_t numberOfPeaks_;
 
-    std::array<Peak, MAX_NUM_PEAKS                               > peaks_ ;
-    std::array<bool, SW::Engine::StaticHalfFFTBuffer::static_size> isPeak_;
+    std::array<Peak, MAX_NUM_PEAKS> peaks_;
+    std::array<bool, LE::SW::Engine::Constants::maximumFFTSize / 2 + 1> isPeak_;
 }; // class PeakDetector
 
 //------------------------------------------------------------------------------

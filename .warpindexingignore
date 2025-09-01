@@ -1,0 +1,154 @@
+# Build artifacts and temporary files
+build/
+**/build/
+**/Build/
+**/builds/
+**/Builds/
+**/.build/
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+*.app
+*.component
+*.vst3
+*.au
+
+# CMake generated files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+*.cmake
+
+# IDE and editor files
+.vscode/
+.idea/
+*.xcodeproj/
+*.xcworkspace/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.swp
+*.swo
+*~
+.#*
+
+# System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Version control (nested repositories)
+**/.git/
+**/.svn/
+**/.hg/
+**/.bzr/
+
+# Large 3rd party dependencies - keeping essential headers but excluding bulk
+3rd_party/**/examples/
+3rd_party/**/docs/
+3rd_party/**/documentation/
+3rd_party/**/test/
+3rd_party/**/tests/
+3rd_party/**/Testing/
+3rd_party/**/benchmark/
+3rd_party/**/benchmarks/
+3rd_party/**/*.pdf
+3rd_party/**/*.png
+3rd_party/**/*.jpg
+3rd_party/**/*.jpeg
+3rd_party/**/*.gif
+3rd_party/**/*.ico
+3rd_party/**/*.svg
+3rd_party/**/trunk/trunk/
+3rd_party/JUCE/trunk/
+# Keep JUCE modules but exclude nested trunks and duplicates
+
+# Audio files and media
+*.wav
+*.aiff
+*.mp3
+*.mp4
+*.flac
+*.ogg
+*.m4a
+*.wma
+*.avi
+*.mov
+*.wmv
+*.flv
+
+# Archives and packages
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.tar.bz2
+*.tbz2
+*.tar.xz
+*.txz
+*.rar
+*.7z
+*.gz
+*.bz2
+*.xz
+
+# Log files
+*.log
+*.logs
+**/logs/
+
+# Temporary and cache files
+tmp/
+temp/
+.tmp/
+.temp/
+cache/
+.cache/
+*.tmp
+*.temp
+*.cache
+
+# Node.js (if any web components)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python cache (if any Python scripts)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+.eggs/
+
+# Documentation that's usually not needed for code intelligence
+**/README*
+**/CHANGELOG*
+**/LICENSE*
+**/COPYING*
+**/INSTALL*
+**/AUTHORS*
+**/CONTRIBUTORS*
+**/THANKS*
+doc/
+docs/
+documentation/

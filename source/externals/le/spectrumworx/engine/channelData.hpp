@@ -14,9 +14,14 @@
 #include "channelDataAmPh.hpp"
 #include "channelDataReIm.hpp"
 
+#ifdef LE_SW_LORIS_ENGINE
+    #include "lorisAnalysisEngine.hpp"
+#endif // LE_SW_LORIS_ENGINE
+
 #include "le/utility/buffers.hpp"
 
 #include <cstdint>
+#include <memory>
 //------------------------------------------------------------------------------
 namespace LE
 {
@@ -137,6 +142,24 @@ public:
     void blendWithPreviousData( float currentDataWeight, bool amPh2ReIm );
     void amplifyCurrentData   ( float gain                              );
 
+#ifdef LE_SW_LORIS_ENGINE
+    /// Enable/disable Loris analysis mode for this channel
+    void setLorisAnalysisMode(bool enabled, const LorisAnalysisEngine::Parameters* params = nullptr);
+    
+    /// Check if Loris analysis is currently enabled
+    bool isLorisAnalysisModeEnabled() const;
+    
+    /// Set custom Loris parameters (only effective when Loris mode is enabled)
+    void setLorisParameters(const LorisAnalysisEngine::Parameters& params);
+    
+    /// Access to the Loris analysis engine (for advanced usage)
+    LorisAnalysisEngine* getLorisEngine() { return lorisEngine_.get(); }
+    const LorisAnalysisEngine* getLorisEngine() const { return lorisEngine_.get(); }
+    
+    /// Set sample rate for Loris processing (should be called before enabling Loris mode)
+    void setSampleRate(float sampleRate) { currentSampleRate_ = sampleRate; }
+#endif // LE_SW_LORIS_ENGINE
+
 private:
     ////////////////////////////////////////////////////////////////////////////
     /// \class InPlaceDFTBuffer
@@ -227,6 +250,13 @@ private:
 
     FullMainSideChannelData_AmPh amphData_      ;
     InPlaceDFTBuffer             dftAndTimeData_;
+
+#ifdef LE_SW_LORIS_ENGINE
+    std::unique_ptr<LorisAnalysisEngine> lorisEngine_;
+    bool                                 lorisAnalysisModeEnabled_;
+    double                               currentTimeStamp_;
+    float                                currentSampleRate_;
+#endif // LE_SW_LORIS_ENGINE
 
 public:
     static std::uint32_t requiredStorage( StorageFactors const & );

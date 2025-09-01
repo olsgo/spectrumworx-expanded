@@ -19,7 +19,11 @@
 #include "le/math/vector.hpp"
 #include "le/parameters/uiElements.hpp"
 
+#ifdef LE_HAS_NT2
 #include "boost/simd/preprocessor/stack_buffer.hpp"
+#else
+#include <vector>
+#endif
 //------------------------------------------------------------------------------
 namespace LE
 {
@@ -131,8 +135,15 @@ void SumoPitchImpl::process( ChannelState & cs, Engine::ChannelData_AmPh2ReIm da
         limitPitchScale( pitchScaleSide, cs.prevPitchScaleSideSemitones, pitchChangeLimitSemitones_ );
     }
 
-    BOOST_SIMD_ALIGNED_SCOPED_STACK_BUFFER( workBufferStorage, char, Engine::ChannelData_AmPhStorage::requiredStorage( engineSetup.fftSize<unsigned int>() ) );
+    auto const storageBytes = Engine::ChannelData_AmPhStorage::requiredStorage( engineSetup.fftSize<unsigned int>() );
+#ifdef LE_HAS_NT2
+    BOOST_SIMD_ALIGNED_SCOPED_STACK_BUFFER( workBufferStorage, char, storageBytes );
     Engine::ChannelData_AmPhStorage psWorkBuffer( engineSetup.fftSize<unsigned int>(), amPhData.beginBin(), amPhData.endBin(), workBufferStorage );
+#else
+    std::vector<char> workBufferStorage( storageBytes );
+    Engine::Storage storageRange( workBufferStorage.data(), workBufferStorage.data() + workBufferStorage.size() );
+    Engine::ChannelData_AmPhStorage psWorkBuffer( engineSetup.fftSize<unsigned int>(), amPhData.beginBin(), amPhData.endBin(), storageRange );
+#endif
 
     { // Pitch shift:
         // Side

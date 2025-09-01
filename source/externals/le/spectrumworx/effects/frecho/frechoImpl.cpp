@@ -19,7 +19,11 @@
 #include "le/math/vector.hpp"
 #include "le/parameters/uiElements.hpp"
 
+#ifdef LE_HAS_NT2
 #include "boost/simd/preprocessor/stack_buffer.hpp"
+#else
+#include <vector>
+#endif
 //------------------------------------------------------------------------------
 /// \todo Investigate frequency-domain echo cancelation.
 /// http://jmvalin.ca/papers/valin_hscma2008.pdf
@@ -143,8 +147,14 @@ void FrechoImpl::doProcess
     if ( !ps_.skipProcessing() )
     {
         unsigned int const fftSize( engineSetup.fftSize<unsigned int>() );
+#ifdef LE_HAS_NT2
         BOOST_SIMD_ALIGNED_SCOPED_STACK_BUFFER( pitchShiftedEchoStorage, char, Engine::ChannelData_AmPhStorage::requiredStorage( fftSize ) );
         Engine::ChannelData_AmPhStorage pitchShiftedEcho( fftSize, target.beginBin(), target.endBin(), pitchShiftedEchoStorage );
+#else
+        std::vector<char> pitchShiftedEchoStorageVector( Engine::ChannelData_AmPhStorage::requiredStorage( fftSize ) );
+        Engine::Storage storageRange( pitchShiftedEchoStorageVector.data(), pitchShiftedEchoStorageVector.data() + pitchShiftedEchoStorageVector.size() );
+        Engine::ChannelData_AmPhStorage pitchShiftedEcho( fftSize, target.beginBin(), target.endBin(), storageRange );
+#endif
 
         Math::reim2AmPh
         (

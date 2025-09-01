@@ -19,7 +19,11 @@
 
 #include "boost/simd/sdk/config/arch.hpp"
 #ifdef LE_PV_USE_TSS
+#ifdef LE_HAS_NT2
 #include "boost/simd/preprocessor/stack_buffer.hpp"
+#else
+#include <vector>
+#endif
 #endif // LE_PV_USE_TSS
 
 #include <cstdint>
@@ -222,13 +226,13 @@ void LE_NOINLINE PitchShifter::process( ChannelState & channelState, Engine::Cha
 //  http://diuf.unifr.ch/main/pai/sites/diuf.unifr.ch.main.pai/files/publications/2008_Juillerat_Schubiger-Banz_Mueller_Enhancing_the_Quality.pdf
 //  http://www.dspdimension.com/admin/time-pitch-overview
 //  http://www.kvraudio.com/forum/viewtopic.php?p=4398391
-//  http://cycling74.com/2006/11/02/the-phase-vocoder-–-part-i
+//  http://cycling74.com/2006/11/02/the-phase-vocoder-ï¿½-part-i
 //  http://recherche.ircam.fr/equipes/analyse-synthese/roebel/paper/phase-waspaa03.pdf
 //  http://articles.ircam.fr/index.php?Action=ShowArticle&IdArticle=14&ViewType=1
 //  http://stackoverflow.com/questions/4633203/extracting-precise-frequencies-from-fft-bins-using-phase-change-between-frames
 //  http://music.informatics.indiana.edu/media/students/kyung/kyung_paper.pdf
 //  http://www.arc.id.au/ZoomFFT.html
-//  MSP tutorial http://cycling74.com/2006/11/02/the-phase-vocoder-–-part-i
+//  MSP tutorial http://cycling74.com/2006/11/02/the-phase-vocoder-ï¿½-part-i
 //  Signal modifications using the STFT http://recherche.ircam.fr/anasyn/roebel/amt_audiosignale/VL3.pdf
 //  Hybrid Time and Frequency Domain Audio Pitch Shifting http://diuf.unifr.ch/pai/people/juillera/PaperComp/AES125/index.html
 //  Low Latency Audio Pitch Shifting in the Time Domain https://diuf.unifr.ch/main/pai/sites/diuf.unifr.ch.main.pai/files/publications/2008_Juillerat_Schubiger-Banz_Mueller_Low_Latency.pdf

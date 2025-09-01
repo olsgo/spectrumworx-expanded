@@ -22,7 +22,11 @@
 #include "le/spectrumworx/engine/setup.hpp"
 #include "le/utility/platformSpecifics.hpp"
 
+#ifdef LE_HAS_NT2
 #include "boost/simd/preprocessor/stack_buffer.hpp"
+#else
+#include <vector>
+#endif
 
 #include "boost/assert.hpp"
 
@@ -174,8 +178,14 @@ void FreqverbImpl::process
     }
 
     {
+#ifdef LE_HAS_NT2
         BOOST_SIMD_ALIGNED_SCOPED_STACK_BUFFER( data2Storage, char, Engine::ChannelData_AmPhStorage::requiredStorage( engineSetup.fftSize<std::uint16_t>() ) );
         Engine::ChannelData_AmPhStorage data2( engineSetup.fftSize<std::uint16_t>(), 0, noEchoBin_, data2Storage );
+#else
+        std::vector<char> data2StorageVector( Engine::ChannelData_AmPhStorage::requiredStorage( engineSetup.fftSize<std::uint16_t>() ) );
+        Engine::Storage storageRange( data2StorageVector.data(), data2StorageVector.data() + data2StorageVector.size() );
+        Engine::ChannelData_AmPhStorage data2( engineSetup.fftSize<std::uint16_t>(), 0, noEchoBin_, storageRange );
+#endif
         BOOST_ASSERT( data2.numberOfBins() == noEchoBin_ );
 
         reim2AmPh

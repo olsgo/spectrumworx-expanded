@@ -80,7 +80,13 @@
         #define LE_FASTCALL_ABI
     #endif // __i386__
 
-    #define LE_RESTRICT __restrict__
+    // On Apple clang (arm64), restrict-qualified pointers can break iterator_traits
+    // and Boost iterator_range specializations; relax LE_RESTRICT in that case.
+    #if defined(__APPLE__) && defined(__clang__) && defined(__aarch64__)
+        #define LE_RESTRICT
+    #else
+        #define LE_RESTRICT __restrict__
+    #endif
 
     #if defined( __clang__ ) || ( ( ( __GNUC__ * 10 ) + __GNUC_MINOR__ ) >= 47 )
         #define LE_OVERRIDE override

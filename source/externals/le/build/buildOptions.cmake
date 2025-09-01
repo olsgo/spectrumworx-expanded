@@ -167,7 +167,8 @@ function( addForceInclude header )
     if ( MSVC )
         set( compilerOption "/FI\"${header}\"" )
     elseif ( CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang )
-        set( compilerOption "-include \"${header}\"" )
+        # Avoid over-quoting; pass header as a plain argument
+        set( compilerOption "-include" "${header}" )
     endif()
     add_compile_options( ${compilerOption} )
 endfunction()
@@ -265,7 +266,7 @@ function( addNT2 )
 
     #...mrmlj...warning in nt2.simd.cmake...
     # http://www.cmake.org/cmake/help/v3.1/policy/CMP0054.html
-    cmake_policy( SET CMP0054 OLD )
+    cmake_policy( SET CMP0054 NEW )
 
     # Implementation note:
     #   Skip the building of the is_supported tool because we don't need SIMD
@@ -373,7 +374,10 @@ function( setupTargetForPlatform projectName architecture )
                 "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)"
             )
         else() # OSX
-            appendProperty( ${projectName} COMPILE_FLAGS ${x86CompilerSwitches} )
+            # Only apply x86 flags when targeting an x86 architecture
+            if ( NOT architecture STREQUAL arm64 )
+                appendProperty( ${projectName} COMPILE_FLAGS ${x86CompilerSwitches} )
+            endif()
 
             # http://www.cmake.org/cmake/help/v3.0/prop_tgt/MACOSX_RPATH.html
             set_property( TARGET ${projectName} PROPERTY MACOSX_RPATH false )
@@ -914,6 +918,11 @@ elseif ( CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang ) #...m
                 set( XCODE_ATTRIBUTE_CFLAGS_i386   "-msse4.1 -march=core2 -mtune=core2"  )
                 set( XCODE_ATTRIBUTE_CFLAGS_x86_64 "-msse4.1 -march=core2 -mtune=corei7" )
                 set( XCODE_ATTRIBUTE_CFLAGS_arm64  "-mcpu=apple-m1" )  # Updated for macOS Sequoia - optimized for Mac desktop performance
+            elseif ( LE_TARGET_ARCHITECTURE STREQUAL arm64 )
+                # Handle ARM64/Apple Silicon architecture
+                set( XCODE_ATTRIBUTE_CFLAGS_i386   ""  )  # No i386 for arm64-only builds
+                set( XCODE_ATTRIBUTE_CFLAGS_x86_64 "" )  # No x86_64 for arm64-only builds  
+                set( XCODE_ATTRIBUTE_CFLAGS_arm64  "-mcpu=apple-m1" )  # Optimized for Apple Silicon
             elseif( DEFINED LE_TARGET_ARCHITECTURE ) #...mrmlj...when buildOptions has to be included before the architecture is set...cleanup...
                 message( FATAL_ERROR "Unknown OSX architecture (${LE_TARGET_ARCHITECTURE})" )
             endif()
@@ -929,10 +938,22 @@ elseif ( CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang ) #...m
             #                                 (25.08.2011.) (Domagoj Saric)
             add_definitions( -DBOOST_MMAP_HEADER_ONLY )
 
-            set( CMAKE_OSX_ARCHITECTURES           "x86_64;arm64"                CACHE STRING "OSX architectures"     FORCE )
-            set( CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS "x86_64 arm64"                CACHE STRING "OSX architectures"     FORCE )
-            set( CMAKE_OSX_SYSROOT                 "macosx"                      CACHE STRING "OSX Base SDK"          FORCE ) #"Latest Mac OS X"
-            set( CMAKE_OSX_SYSROOT_DEFAULT         ${CMAKE_OSX_SYSROOT}          CACHE STRING "OSX Base SDK default"  FORCE )
+            # Prefer single-arch builds when explicitly targeting arm64
+            if ( LE_TARGET_ARCHITECTURE STREQUAL arm64 )
+                set( CMAKE_OSX_ARCHITECTURES           "arm64"                    CACHE STRING "OSX architectures"     FORCE )
+                set( CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS "arm64"                    CACHE STRING "OSX architectures"     FORCE )
+            else()
+                set( CMAKE_OSX_ARCHITECTURES           "x86_64;arm64"            CACHE STRING "OSX architectures"     FORCE )
+                set( CMAKE_XCODE_ATTRIBUTE_VALID_ARCHS "x86_64 arm64"            CACHE STRING "OSX architectures"     FORCE )
+            endif()
+            # Avoid forcing a string SDK name into -isysroot; let CMake resolve path
+            if ( LE_TARGET_ARCHITECTURE STREQUAL arm64 )
+                set( CMAKE_OSX_SYSROOT             ""                            CACHE STRING "OSX Base SDK"          FORCE )
+                set( CMAKE_OSX_SYSROOT_DEFAULT     ""                            CACHE STRING "OSX Base SDK default"  FORCE )
+            else()
+                set( CMAKE_OSX_SYSROOT             "macosx"                      CACHE STRING "OSX Base SDK"          FORCE ) #"Latest Mac OS X"
+                set( CMAKE_OSX_SYSROOT_DEFAULT     ${CMAKE_OSX_SYSROOT}          CACHE STRING "OSX Base SDK default"  FORCE )
+            endif()
             if ( LE_SDK_BUILD )
                 set( CMAKE_OSX_DEPLOYMENT_TARGET   "12.0"                        CACHE STRING "OSX deployment target" FORCE )
             else() #...mrmlj...updated for macOS Sequoia compatibility - macOS 12.0 supports all current hardware

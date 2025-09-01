@@ -16,7 +16,11 @@
 #include "le/spectrumworx/engine/setup.hpp"
 #include "le/utility/buffers.hpp"
 
+#ifdef LE_HAS_NT2
 #include "boost/simd/preprocessor/stack_buffer.hpp"
+#else
+#include <vector>
+#endif
 //------------------------------------------------------------------------------
 namespace LE
 {
@@ -75,6 +79,7 @@ void SmootherImpl::process( Engine::ChannelData_AmPh data, Engine::Setup const &
     unsigned int filterLenHalf( filterLenHalf_ );
     if ( filterLenHalf == 0 )
         return;
+#ifdef LE_HAS_NT2
     BOOST_SIMD_ALIGNED_SCOPED_STACK_BUFFER( workBuffer, Engine::real_t, data.size() );
     //...mrmlj...
     unsigned int const dataSize( static_cast<unsigned int>( workBuffer.size() ) );
@@ -84,6 +89,18 @@ void SmootherImpl::process( Engine::ChannelData_AmPh data, Engine::Setup const &
         filterLenHalf = dataSize / 2 - 1;
     Math::symmetricMovingAverage( data.amps(), workBuffer, filterLenHalf );
     Math::copy( workBuffer, data.amps() );
+#else
+    std::vector<Engine::real_t> workBufferVector( data.size() );
+    //...mrmlj...
+    unsigned int const dataSize( static_cast<unsigned int>( workBufferVector.size() ) );
+    if ( dataSize < 4 )
+        return;
+    if ( filterLenHalf > dataSize / 2 )
+        filterLenHalf = dataSize / 2 - 1;
+    auto workBuffer = boost::make_iterator_range( workBufferVector.data(), workBufferVector.data() + workBufferVector.size() );
+    Math::symmetricMovingAverage( data.amps(), workBuffer, filterLenHalf );
+    Math::copy( workBuffer, data.amps() );
+#endif
 }
 
 //------------------------------------------------------------------------------

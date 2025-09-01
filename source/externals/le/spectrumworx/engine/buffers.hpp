@@ -50,6 +50,17 @@ namespace Engine
 /// Helper, frequently used typedefs.
 //...mrmlj...to be removed soon...
 using StaticHalfFFTBuffer = Utility::AlignedBuffer<float, LE::SW::Engine::Constants::maximumFFTSize / 2 + 1, false, Utility::Constants::vectorAlignment>;
+
+////////////////////////////////////////////////////////////////////////////////
+///
+/// \typedef HeapSharedStorage
+///
+////////////////////////////////////////////////////////////////////////////////
+
+using HeapSharedStorage = Utility::AlignedHeapBuffer<char>;
+#else
+// Fallback definition when NT2 is not available
+using HeapSharedStorage = std::vector<char>;
 #endif // LE_HAS_NT2
 
 using real_t = float;
@@ -178,8 +189,8 @@ public:
 // www.lysator.liu.se/c/restrict.html
 // http://cellperformance.beyond3d.com/articles/2006/05/demystifying-the-restrict-keyword.html
 // http://people.cs.pitt.edu/~mock/papers/clei2004.pdf
-using         DataRange = boost::iterator_range<float       * LE_RESTRICT>;
-using ReadOnlyDataRange = boost::iterator_range<float const * LE_RESTRICT>;
+using         DataRange = boost::iterator_range<float       *>;
+using ReadOnlyDataRange = boost::iterator_range<float const *>;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -430,11 +441,11 @@ private:
 class SharedStorageHalfFFTBufferPair : public SharedStorageDataPairImpl<HalfFFTBuffer<float>>
 {
 protected: template <class FullRangeData, class SubRangeHolder> friend class SubRange;
-    using Impl::first ;
-    using Impl::second;
-
-    ReadOnlyDataRange const & first () const { return reinterpret_cast<ReadOnlyDataRange const &>( data()[ First  ] ); }
-    ReadOnlyDataRange const & second() const { return reinterpret_cast<ReadOnlyDataRange const &>( data()[ Second ] ); }
+    // Writable and read-only accessors to underlying buffers as ranges
+    DataRange         & first ()       { return reinterpret_cast<DataRange         &>( this->data()[ First  ] ); }
+    DataRange         & second()       { return reinterpret_cast<DataRange         &>( this->data()[ Second ] ); }
+    ReadOnlyDataRange const & first () const { return reinterpret_cast<ReadOnlyDataRange const &>( this->data()[ First  ] ); }
+    ReadOnlyDataRange const & second() const { return reinterpret_cast<ReadOnlyDataRange const &>( this->data()[ Second ] ); }
 }; // class SharedStorageHalfFFTBufferPair
 
 

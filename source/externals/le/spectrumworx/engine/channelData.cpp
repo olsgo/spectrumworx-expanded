@@ -40,6 +40,11 @@ ChannelData::ChannelData()
     :
     amphDataFreshness_( 0 ),
     dftDataFreshness_ ( 0 )
+#ifdef LE_SW_LORIS_ENGINE
+    , lorisAnalysisModeEnabled_( false ),
+    currentTimeStamp_( 0.0 ),
+    currentSampleRate_( 44100.0f )
+#endif // LE_SW_LORIS_ENGINE
 {
 }
 
@@ -57,16 +62,45 @@ void ChannelData::setNewTimeDomainData
     dftDataFreshness_  = 0;
     BOOST_ASSERT( fftSize() == fft.size() );
 
-    dftAndTimeData_.setToDFTDomain();
-    time2DFT
-    (
-        mainChannel,
-        dftData().main(),
-        window,
-        fft,
-        windowSizeFactor
-    );
-    dftDataFreshness_ = 1;
+#ifdef LE_SW_LORIS_ENGINE
+    // Update sample rate tracking for Loris engine
+    // Note: We assume sample rate doesn't change during processing
+    // currentSampleRate_ should be set externally when the plugin initializes
+    
+    // Update timestamp for Loris processing
+    currentTimeStamp_ += static_cast<double>(fft.size()) / currentSampleRate_;
+    
+    // If Loris analysis is enabled, process through Loris instead of FFT
+    if (isLorisAnalysisModeEnabled() && mainChannel)
+    {
+        // Analyze time-domain data with Loris
+        if (lorisEngine_->analyzeFrame(mainChannel, static_cast<std::uint16_t>(fft.size()), currentTimeStamp_))
+        {
+            // Convert Loris partials to SpectrumWorx AmPh format
+            lorisEngine_->convertToAmPh(amphData().main(), static_cast<std::uint16_t>(fft.size()), currentSampleRate_);
+            amphDataFreshness_ = 1;
+            
+            // Also populate ReIm data for compatibility
+            lorisEngine_->convertToReIm(dftData().main(), static_cast<std::uint16_t>(fft.size()), currentSampleRate_);
+            dftAndTimeData_.setToDFTDomain();
+            dftDataFreshness_ = 1;
+        }
+        else
+        {
+            // Fallback to FFT if Loris analysis fails
+            dftAndTimeData_.setToDFTDomain();
+            time2DFT(mainChannel, dftData().main(), window, fft, windowSizeFactor);
+            dftDataFreshness_ = 1;
+        }
+    }
+    else
+#endif // LE_SW_LORIS_ENGINE
+    {
+        // Standard FFT processing
+        dftAndTimeData_.setToDFTDomain();
+        time2DFT(mainChannel, dftData().main(), window, fft, windowSizeFactor);
+        dftDataFreshness_ = 1;
+    }
 
     if ( sideChannel )
     {
@@ -415,6 +449,57 @@ void ChannelData::InPlaceDFTBuffer::setToTimeDomain()
     dataIsDFTDomain_ = false;
 #endif // NDEBUG
 }
+
+#ifdef LE_SW_LORIS_ENGINE
+
+void ChannelData::setLorisAnalysisMode(bool enabled, const LorisAnalysisEngine::Parameters* params)
+{
+    lorisAnalysisModeEnabled_ = enabled;
+    
+    if (enabled)
+    {
+        // Create Loris engine if needed
+        if (!lorisEngine_)
+        {
+            lorisEngine_ = std::make_unique<LorisAnalysisEngine>();
+        }
+        
+        // Initialize with parameters
+        LorisAnalysisEngine::Parameters lorisParams;
+        if (params)
+        {
+            lorisParams = *params;
+        }
+        else
+        {
+            // Use FFT-adapted parameters
+            lorisParams = LorisAnalysisEngine::Parameters(fftSize(), currentSampleRate_);
+        }
+        
+        lorisEngine_->initialize(lorisParams, currentSampleRate_);
+    }
+    else if (lorisEngine_)
+    {
+        // Reset Loris engine when disabled
+        lorisEngine_->reset();
+    }
+}
+
+bool ChannelData::isLorisAnalysisModeEnabled() const
+{
+    return lorisAnalysisModeEnabled_ && lorisEngine_ && lorisEngine_->isInitialized();
+}
+
+void ChannelData::setLorisParameters(const LorisAnalysisEngine::Parameters& params)
+{
+    if (lorisEngine_ && lorisEngine_->isInitialized())
+    {
+        // Reinitialize with new parameters
+        lorisEngine_->initialize(params, currentSampleRate_);
+    }
+}
+
+#endif // LE_SW_LORIS_ENGINE
 
 //------------------------------------------------------------------------------
 LE_IMPL_NAMESPACE_END( Engine )

@@ -13,7 +13,7 @@
 //------------------------------------------------------------------------------
 #include "le/utility/platformSpecifics.hpp"
 
-#include <juce/juce_core/juce_core.h>
+#include "juce/juce_core/juce_core.h"
 
 #include <boost/range/iterator_range_core.hpp>
 #include <boost/smart_ptr/scoped_array.hpp>
@@ -47,7 +47,8 @@ namespace Utility
 class Sample
 {
 public:
-    using ChannelData = boost::iterator_range<float const * LE_RESTRICT>;
+    // Avoid restrict-qualified pointer here; it breaks iterator_traits on libc++
+    using ChannelData = boost::iterator_range<float const *>;
 
 public:
     char const * load( juce::File const & sampleFile, unsigned int desiredSampleRate, Utility::CriticalSection & );

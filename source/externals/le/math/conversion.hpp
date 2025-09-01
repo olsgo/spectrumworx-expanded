@@ -19,8 +19,10 @@
 #include <boost/detail/endian.hpp>
 #include <boost/integer/static_log2.hpp>
 
-#include <boost/simd/sdk/config/arch.hpp>
-#include <boost/simd/sdk/simd/extensions.hpp>
+#ifdef LE_HAS_NT2
+# include <boost/simd/sdk/config/arch.hpp>
+# include <boost/simd/sdk/simd/extensions.hpp>
+#endif // LE_HAS_NT2
 
 #include <cmath>
 #include <cstdint>

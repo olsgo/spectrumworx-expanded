@@ -1,0 +1,5 @@
+gather_includes --ignore impl --ignore details --ignore preprocessed nt2/complex/functions --out nt2/complex/include/functions nt2/complex/include/functions --out nt2/complex/functions.hpp --out nt2/include/functions
+gather_includes --ignore impl --ignore details --ignore preprocessed nt2/complex/constants --out nt2/complex/include/constants nt2/complex/include/constants --out nt2/complex/constants.hpp --out nt2/include/constants
+gather_includes nt2/complex/functions.hpp nt2/complex/constants.hpp --out nt2/complex/complex.hpp
+gather_includes --ignore impl --ignore details --ignore preprocessed --max 1 nt2/complex/functions nt2/complex/functions/generic nt2/complex/functions/scalar nt2/complex/functions/scalar --out nt2/complex/include/functions/scalar nt2/complex/include/functions/scalar --out nt2/include/functions/scalar
+gather_includes --ignore impl --ignore details --ignore preprocessed --max 1 nt2/complex/functions nt2/complex/functions/generic nt2/complex/functions/scalar nt2/complex/functions/simd --out nt2/complex/include/functions/simd nt2/complex/include/functions/simd --out nt2/include/functions/simd

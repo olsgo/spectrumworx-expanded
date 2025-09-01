@@ -76,6 +76,8 @@ LE_IMPL_NAMESPACE_BEGIN( Math )
 
 // http://www.strchr.com/optimized_abs_function
 using std::abs;
+using std::min;
+using std::max;
 inline std::uint32_t abs( unsigned int   const value ) { return value; }
 inline std::uint16_t abs(          short const value ) { return static_cast<std::uint16_t>( std::abs( static_cast<int>( value ) ) ); }
 inline std::uint16_t abs( unsigned short const value ) { return value; }

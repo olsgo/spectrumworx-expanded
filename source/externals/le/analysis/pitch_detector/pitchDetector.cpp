@@ -15,7 +15,11 @@
 #include "le/math/vector.hpp"
 #include "le/spectrumworx/engine/setup.hpp"
 
+#ifdef LE_HAS_NT2
 #include "boost/simd/preprocessor/stack_buffer.hpp"
+#else
+#include <vector>
+#endif
 
 #include <boost/assert.hpp>
 
@@ -134,6 +138,7 @@ float LE_FASTCALL PitchDetector::findPitch
     // Find peaks:
     pd.findPeaksAndEstimateFrequency( amplitudes.begin(), numberOfBins, engineSetup.sampleRate<std::uint32_t>() );
     // Delete non-peaks to make it easier for HPS:
+#ifdef LE_HAS_NT2
     BOOST_SIMD_ALIGNED_SCOPED_STACK_BUFFER( filteredAmps, float, numberOfBins );
     Math::copy( amplitudes, filteredAmps );
     pd.attenuateNonPeaks( filteredAmps.begin(), 0, numberOfBins - 1, 300.0f );
@@ -143,6 +148,17 @@ float LE_FASTCALL PitchDetector::findPitch
     findHarmonicProductSpectrumAndSort( filteredAmps, hps );
     // Estimate pitch:
     float pitch( estimatePitch( cs.lastPitch, lfb, hfb, hps, pd ) );
+#else
+    std::vector<float> filteredAmps( numberOfBins );
+    std::copy( amplitudes.begin(), amplitudes.end(), filteredAmps.begin() );
+    pd.attenuateNonPeaks( filteredAmps.data(), 0, numberOfBins - 1, 300.0f );
+
+    std::vector<HPS> hps( numberOfBins );
+    SW::Engine::ReadOnlyDataRange ampsRange( filteredAmps.data(), filteredAmps.data() + numberOfBins );
+    HPSRange hpsRange( hps.data(), hps.data() + numberOfBins );
+    findHarmonicProductSpectrumAndSort( ampsRange, hpsRange );
+    float pitch( estimatePitch( cs.lastPitch, lfb, hfb, hpsRange, pd ) );
+#endif
 
 #ifdef LE_SW_PURE_ANALYSIS
     std::uint8_t const maximumConfidence        ( 5    );

@@ -1,0 +1,3 @@
+gather_includes --ignore details --ignore impl --name tags.hpp boost/simd/sdk/simd/extensions/meta --out boost/simd/sdk/simd/extensions/meta
+gather_includes --ignore details --ignore impl --ignore detector --name detect.hpp boost/simd/sdk/config/details --out boost/simd/sdk/config/details
+gather_includes --ignore details --ignore impl --ignore detector --name support.hpp boost/simd/sdk/config/details --out boost/simd/sdk/config/details

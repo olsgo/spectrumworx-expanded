@@ -64,7 +64,11 @@
 #include "le/spectrumworx/engine/processor.hpp"
 #include "le/spectrumworx/engine/setup.hpp"
 
+#ifdef LE_HAS_NT2
 #include "boost/simd/preprocessor/stack_buffer.hpp"
+#else
+#include <vector>
+#endif
 
 #include "boost/assert.hpp"
 //------------------------------------------------------------------------------
@@ -140,8 +144,14 @@ void TalkingWindImpl::process( Engine::MainSideChannelData_AmPh data, Engine::Se
     // time domain frame (i.e. the size of the FFT but allocate it as "two
     // aligned half-FFT size" buffers so that it can be used for both time
     // domain and ReIm intermediate results):
+#ifdef LE_HAS_NT2
     BOOST_SIMD_ALIGNED_STACK_BUFFER( doubleWorkBuffer, Engine::real_t, ( alignIndex( fullNumberOfBins ) * 2 ) );
     DataRange envelope( &doubleWorkBuffer[ 0 ], &doubleWorkBuffer[ fullNumberOfBins ] );
+#else
+    std::vector<Engine::real_t> doubleWorkBufferVector( alignIndex( fullNumberOfBins ) * 2 );
+    Engine::real_t* doubleWorkBuffer = doubleWorkBufferVector.data();
+    DataRange envelope( &doubleWorkBuffer[ 0 ], &doubleWorkBuffer[ fullNumberOfBins ] );
+#endif
 
     std::uint16_t const skippedLeadingBins ( data.beginBin()                  );
     std::uint16_t const skippedTrailingBins( fullNumberOfBins - data.endBin() );
@@ -151,7 +161,12 @@ void TalkingWindImpl::process( Engine::MainSideChannelData_AmPh data, Engine::Se
     // DFT calculation).
     add( data.full().main().amps(), std::numeric_limits<float>::epsilon(), envelope );
     ln ( envelope );
+#ifdef LE_HAS_NT2
     lowPassSpectrum_cepstrum( envelope, doubleWorkBuffer, setup );
+#else
+    DataRange workBufferRange( doubleWorkBuffer, doubleWorkBuffer + ( alignIndex( fullNumberOfBins ) * 2 ) );
+    lowPassSpectrum_cepstrum( envelope, workBufferRange, setup );
+#endif
     envelope.advance_begin( + skippedLeadingBins  );
     envelope.advance_end  ( - skippedTrailingBins );
     exp( envelope );

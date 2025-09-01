@@ -1,0 +1,5 @@
+gather_includes --ignore impl --ignore details --ignore preprocessed nt2/signal/functions --out nt2/signal/include/functions nt2/signal/include/functions --out nt2/signal/functions.hpp --out nt2/include/functions
+gather_includes --ignore impl --ignore details --ignore preprocessed nt2/signal/constants --out nt2/signal/include/constants nt2/signal/include/constants --out nt2/signal/constants.hpp --out nt2/include/constants
+gather_includes nt2/signal/functions.hpp nt2/signal/constants.hpp --out nt2/signal/signal.hpp
+gather_includes --ignore impl --ignore details --ignore preprocessed --max 1 nt2/signal/functions nt2/signal/functions/generic nt2/signal/functions/scalar nt2/signal/functions/scalar --out nt2/signal/include/functions/scalar nt2/signal/include/functions/scalar --out nt2/include/functions/scalar
+gather_includes --ignore impl --ignore details --ignore preprocessed --max 1 nt2/signal/functions nt2/signal/functions/generic nt2/signal/functions/scalar nt2/signal/functions/simd --out nt2/signal/include/functions/simd nt2/signal/include/functions/simd --out nt2/include/functions/simd

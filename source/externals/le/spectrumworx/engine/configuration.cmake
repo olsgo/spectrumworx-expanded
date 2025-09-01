@@ -19,7 +19,7 @@ set_property( CACHE LE_SW_ENGINE_INPUT_MODE PROPERTY STRINGS full read-only disa
 mark_as_advanced( LE_SW_ENGINE_INPUT_MODE )
 if ( LE_SW_ENGINE_INPUT_MODE STREQUAL full )
     add_definitions( -DLE_SW_ENGINE_INPUT_MODE=2 )
-elseif()
+elseif( LE_SW_ENGINE_INPUT_MODE STREQUAL read-only )
     add_definitions( -DLE_SW_ENGINE_INPUT_MODE=1 )
 else()
     add_definitions( -DLE_SW_ENGINE_INPUT_MODE=0 )

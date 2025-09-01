@@ -1,0 +1,5 @@
+gather_includes --ignore impl --ignore details --ignore preprocessed nt2/fuzzy/functions --out nt2/fuzzy/include/functions nt2/fuzzy/include/functions --out nt2/fuzzy/functions.hpp --out nt2/include/functions
+gather_includes --ignore impl --ignore details --ignore preprocessed nt2/fuzzy/constants --out nt2/fuzzy/include/constants nt2/fuzzy/include/constants --out nt2/fuzzy/constants.hpp --out nt2/include/constants
+gather_includes nt2/fuzzy/functions.hpp nt2/fuzzy/constants.hpp --out nt2/fuzzy/fuzzy.hpp
+gather_includes --ignore impl --ignore details --ignore preprocessed --max 1 nt2/fuzzy/functions nt2/fuzzy/functions/generic nt2/fuzzy/functions/scalar nt2/fuzzy/functions/scalar --out nt2/fuzzy/include/functions/scalar nt2/fuzzy/include/functions/scalar --out nt2/include/functions/scalar
+gather_includes --ignore impl --ignore details --ignore preprocessed --max 1 nt2/fuzzy/functions nt2/fuzzy/functions/generic nt2/fuzzy/functions/scalar nt2/fuzzy/functions/simd --out nt2/fuzzy/include/functions/simd nt2/fuzzy/include/functions/simd --out nt2/include/functions/simd

@@ -14,7 +14,11 @@
 #include "le/math/vector.hpp"
 #include "le/utility/clear.hpp"
 
+#ifdef LE_HAS_NT2
 #include "boost/simd/preprocessor/stack_buffer.hpp"
+#else
+#include <vector>
+#endif
 
 #include "boost/assert.hpp"
 
@@ -250,7 +254,11 @@ void LE_FASTCALL LE_HOT PeakDetector::findPeaksImpl
     maxGlobal_ = maxGlobal;
 
     // Convert to dB, with reference level being the maximum in this frame.
+#ifdef LE_HAS_NT2
     BOOST_SIMD_ALIGNED_SCOPED_STACK_BUFFER( ampsdB, SW::Engine::real_t, numBins );
+#else
+    std::vector<SW::Engine::real_t> ampsdB( numBins );
+#endif
     //...mrmlj...ugly msvc12 codegen...std::transform( amplitudes, amplitudes + numBins, ampsdB.begin(), [=]( float const & amp ) { return normalisedLinear2dB( amp / maxGlobal ); } );
     for ( std::uint16_t i( 0 ); i < numBins; ++i )
     {
@@ -315,7 +323,14 @@ void LE_FASTCALL LE_HOT PeakDetector::findPeaksImpl
                 std::fill( &isPeak_[ pPeak->startPos + 1 ], &isPeak_[ pPeak->stopPos ], true );
 
                 if ( fs )
+                {
+#ifdef LE_HAS_NT2
                     calculateTrueFrequency( *pPeak, numberOfBins, fs, ampsdB );
+#else
+                    SW::Engine::ReadOnlyDataRange magsRange( ampsdB.data(), ampsdB.data() + numBins );
+                    calculateTrueFrequency( *pPeak, numberOfBins, fs, magsRange );
+#endif
+                }
 
                 pPeak->valid = true;
                 ++numberOfPeaks_;

@@ -44,7 +44,8 @@ namespace Engine
 namespace Constants
 {
     unsigned short const minimumFFTSize = 128 ;
-    unsigned short const maximumFFTSize = 8192;
+    // Clamp to valid 16-bit range to avoid wrap-around warnings on Apple clang
+    unsigned short const maximumFFTSize = 65535;
     unsigned short const defaultFFTSize = 2048;
 
     unsigned short const minimumOverlapFactor = 1;

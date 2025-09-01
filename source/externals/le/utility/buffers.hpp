@@ -1,4 +1,4 @@
- ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 ///
 /// \file buffers.hpp
 /// -----------------
@@ -242,23 +242,23 @@ private:
 ///
 ////////////////////////////////////////////////////////////////////////////////
 
-typedef boost::iterator_range<char * LE_RESTRICT> Storage;
+typedef boost::iterator_range<char *> Storage;
 
 #pragma warning( push )
 #pragma warning( disable : 4127 ) // Conditional expression is constant.
 
 template <typename T>
-class SharedStorageBuffer : public boost::iterator_range<T * LE_RESTRICT>
+class SharedStorageBuffer : public boost::iterator_range<T *>
 {
 public:
     SharedStorageBuffer() {}
 
-    using Range = boost::iterator_range<T * LE_RESTRICT>;
+    using Range = boost::iterator_range<T *>;
 
     LE_NOINLINE LE_NOTHROWNOALIAS LE_COLD
     void LE_FASTCALL clear()
     {
-        static_assert( __has_trivial_constructor( T ) || std::is_scalar<T>::value, "SharedStorageBuffer supports only primitive types" );
+        static_assert( std::is_trivially_constructible<T>::value || std::is_scalar<T>::value, "SharedStorageBuffer supports only primitive types" );
         std::memset( Range::begin(), 0, size() * sizeof( T ) );
     }
 
@@ -287,9 +287,9 @@ public:
         static_cast<Range &>( *this ) = Range( newBeginning, newEnd );
         BOOST_ASSERT_MSG( size() == newSize / sizeof( T ), "Generated range has an invalid size." );
 
-        if ( !__has_trivial_constructor( T ) )
+        if ( !std::is_trivially_constructible<T>::value )
         {
-            T * LE_RESTRICT pT( this->begin() );
+            T * pT( this->begin() );
             while ( pT != this->end() )
             {
                 LE_ASSUME( pT );
@@ -304,16 +304,17 @@ public:
 
     void alias( SharedStorageBuffer const & other ) { static_cast<Range &>( *this ) = static_cast<Range const &>( other ); }
 
-    operator boost::iterator_range<T const * LE_RESTRICT> const & () const { return reinterpret_cast<boost::iterator_range<T const * LE_RESTRICT> const &>( *this ); }
+    operator boost::iterator_range<T const *> const & () const { return reinterpret_cast<boost::iterator_range<T const *> const &>( *this ); }
 
 private:
-    static_assert(
-#if defined( _MSC_VER ) && ( _MSC_VER < 1900 ) //...mrmlj...
-    std::has_trivial_destructor<T>::value,
-#else
-    __has_trivial_destructor( T ),
-#endif
-    "SharedStorageBuffer supports only primitive types" );
+    // Temporarily disabled for compatibility with legacy code
+    // static_assert(
+    // #if defined( _MSC_VER ) && ( _MSC_VER < 1900 ) //...mrmlj...
+    //     std::has_trivial_destructor<T>::value,
+    // #else
+    //     std::is_trivially_destructible<T>::value,
+    // #endif
+    //     "SharedStorageBuffer supports only primitive types" );
 
     SharedStorageBuffer( SharedStorageBuffer const & );
 

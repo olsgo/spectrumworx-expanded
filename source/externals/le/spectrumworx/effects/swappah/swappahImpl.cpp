@@ -14,7 +14,11 @@
 #include "le/spectrumworx/effects/indexRange.hpp"
 #include "le/spectrumworx/engine/channelDataAmPh.hpp"
 
+#ifdef LE_HAS_NT2
 #include "boost/simd/preprocessor/stack_buffer.hpp"
+#else
+#include <vector>
+#endif
 
 #include <array>
 //------------------------------------------------------------------------------
@@ -104,8 +108,14 @@ void SwappahImpl::swapBands( DataRange const & data ) const
 {
     using namespace Math;
 
+#ifdef LE_HAS_NT2
     BOOST_SIMD_ALIGNED_SCOPED_STACK_BUFFER( swapBuffer, Engine::real_t, data.size() );
     copy( data, swapBuffer );
+#else
+    std::vector<Engine::real_t> swapBufferVector( data.size() );
+    auto swapBuffer = boost::make_iterator_range( swapBufferVector.data(), swapBufferVector.data() + swapBufferVector.size() );
+    copy( data, swapBuffer );
+#endif
 
     std::uint16_t const numBins( static_cast<std::uint16_t>( data.size() ) );
     std::uint16_t const lStart(      0 );

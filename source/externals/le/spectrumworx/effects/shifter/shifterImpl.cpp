@@ -17,7 +17,11 @@
 #include "le/spectrumworx/engine/channelDataAmPh.hpp"
 #include "le/utility/buffers.hpp"
 
+#ifdef LE_HAS_NT2
 #include "boost/simd/preprocessor/stack_buffer.hpp"
+#else
+#include <vector>
+#endif
 //------------------------------------------------------------------------------
 namespace LE
 {
@@ -123,6 +127,7 @@ void ShifterImpl::shift( DataRange const & data ) const
     unsigned int sourceBin;
     unsigned int targetBin;
 
+#ifdef LE_HAS_NT2
     BOOST_SIMD_ALIGNED_SCOPED_STACK_BUFFER( circularTailBuffer, Engine::real_t, shiftLength );
     if ( type == Tail::Circular )
     {
@@ -130,6 +135,16 @@ void ShifterImpl::shift( DataRange const & data ) const
         else                  { sourceBin = 0                    ; }
         Math::copy( &data[ sourceBin ], circularTailBuffer.begin(), shiftLength );
     }
+#else
+    std::vector<Engine::real_t> circularTailBufferVector( shiftLength );
+    auto circularTailBuffer = boost::make_iterator_range( circularTailBufferVector.data(), circularTailBufferVector.data() + circularTailBufferVector.size() );
+    if ( type == Tail::Circular )
+    {
+        if ( positiveOffset ) { sourceBin = numBins - shiftLength; }
+        else                  { sourceBin = 0                    ; }
+        Math::copy( &data[ sourceBin ], circularTailBuffer.begin(), shiftLength );
+    }
+#endif
 
     // In any case:
     {

@@ -16,7 +16,12 @@
 #include "le/math/vector.hpp"
 #include "le/parameters/uiElements.hpp"
 
+#ifdef LE_HAS_NT2
 #include "boost/simd/preprocessor/stack_buffer.hpp"
+#else
+#include <vector>
+#define BOOST_SIMD_ALIGNED_STACK_BUFFER(name, type, size) std::vector<type> name(size)
+#endif
 
 #include <limits>
 //------------------------------------------------------------------------------
@@ -119,8 +124,13 @@ void LE_HOT ColoriferImpl::process( Engine::MainSideChannelData_AmPh data, Engin
     {
         BOOST_SIMD_ALIGNED_STACK_BUFFER( xStorage, Engine::real_t, numberOfBins );
         BOOST_SIMD_ALIGNED_STACK_BUFFER( yStorage, Engine::real_t, numberOfBins );
+#ifdef LE_HAS_NT2
         x = xStorage;
         y = yStorage;
+#else
+        x = ReadOnlyDataRange(xStorage.data(), xStorage.data() + numberOfBins);
+        y = ReadOnlyDataRange(yStorage.data(), yStorage.data() + numberOfBins);
+#endif
         copy( sideAmps.begin(), xStorage.begin(), numberOfBins ); //...mrmlj...no out-of-place vectorized squareRoot, square, exp...
         copy( mainAmps.begin(), yStorage.begin(), numberOfBins );
 

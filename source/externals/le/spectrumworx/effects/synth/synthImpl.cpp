@@ -63,7 +63,7 @@
 /// http://ccrma.stanford.edu/software/stk/index.html
 /// http://musicdsp.org/archive.php?classid=1
 /// http://www.scs.ryerson.ca/~lkolasa/CppWavelets.html
-/// http://www.earlevel.com/main/2012/05/25/a-wavetable-oscillator—the-code
+/// http://www.earlevel.com/main/2012/05/25/a-wavetable-oscillatorï¿½the-code
 /// http://github.com/vinniefalco/DSPFilters
 /// http://ldesoras.free.fr
 /// http://mobilesynth.googlecode.com/svn/trunk/mobilesynth/Classes/synth
@@ -92,7 +92,11 @@
 #include "le/utility/matlab.hpp"
 #endif // LE_UTILITY_MATLAB_INTEROP
 
+#ifdef LE_HAS_NT2
 #include "boost/simd/preprocessor/stack_buffer.hpp"
+#else
+#include <vector>
+#endif
 
 #include <cmath>
 #include <limits>
@@ -211,7 +215,12 @@ void SynthImpl::setup( IndexRange const & workingRange, Engine::Setup const & en
         auto const sr          ( engineSetup.sampleRate<double>() );
         auto const numberOfBins( engineSetup.numberOfBins()       );
 
+#ifdef LE_HAS_NT2
         BOOST_SIMD_ALIGNED_SCOPED_STACK_BUFFER( freqCoefficients, Engine::real_t, lastFFTSize_ + 2 + 16 /*for alignment padding between real and imag*/ );
+#else
+        std::vector<Engine::real_t> freqCoefficientsVector( lastFFTSize_ + 2 + 16 /*for alignment padding between real and imag*/ );
+        auto freqCoefficients = boost::make_iterator_range( freqCoefficientsVector.data(), freqCoefficientsVector.data() + freqCoefficientsVector.size() );
+#endif
         LE_DISABLE_LOOP_UNROLLING()
         for ( std::uint16_t bin( 0 ); bin < lastFFTSize_; ++bin )
             freqCoefficients[ bin ] = std::sin( omega * bin / sr );
@@ -229,8 +238,15 @@ void SynthImpl::setup( IndexRange const & workingRange, Engine::Setup const & en
         auto const pImags     ( static_cast<float *>( Math::align( &freqCoefficients[ numberOfBins ] ) ) );
         fft.transform( pTimeDomain, DataRange( pImags, pImags + numberOfBins ), true );
 
+#ifdef LE_HAS_NT2
         BOOST_SIMD_ALIGNED_SCOPED_STACK_BUFFER( amps  , Engine::real_t, numberOfBins );
         BOOST_SIMD_ALIGNED_SCOPED_STACK_BUFFER( phases, Engine::real_t, numberOfBins );
+#else
+        std::vector<Engine::real_t> ampsVector( numberOfBins );
+        std::vector<Engine::real_t> phasesVector( numberOfBins );
+        auto amps = boost::make_iterator_range( ampsVector.data(), ampsVector.data() + ampsVector.size() );
+        auto phases = boost::make_iterator_range( phasesVector.data(), phasesVector.data() + phasesVector.size() );
+#endif
         auto const pAmps  ( amps  .begin() );
         auto const pPhases( phases.begin() );
         Math::reim2AmPh( pReals, pImags, pAmps, pPhases, numberOfBins );
