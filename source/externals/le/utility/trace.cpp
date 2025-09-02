@@ -133,7 +133,9 @@ void Tracer::error( char const * const pFormatString, ... )
         std::fputs( &formattedError[ 1 ], stderr );
         pFormattedError[ charactersWritten + 0 ] = '\n';
         pFormattedError[ charactersWritten + 1 ] = '\0';
+        #ifdef _WIN32
         ::OutputDebugStringA( &formattedError[ 1 ] );
+        #endif // _WIN32
     #endif
 #endif // platform/compiler
     va_end( arglist );
@@ -164,7 +166,9 @@ void Tracer::message( char const * const pFormatString, ... )
     #else
         formattedMessage[ charactersWritten + 0 ] = '\n';
         formattedMessage[ charactersWritten + 1 ] = '\0';
+        #ifdef _WIN32
         ::OutputDebugStringA( formattedMessage );
+        #endif // _WIN32
     #endif
 #endif // platform/compiler
     va_end( arglist );

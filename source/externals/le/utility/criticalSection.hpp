@@ -41,6 +41,31 @@ using CriticalSection = boost::signals2::mutex;
 class CriticalSection
 {
 public:
+    // Fix pthread constant compatibility for Linux systems
+    #ifndef PTHREAD_RECURSIVE_MUTEX
+        #ifdef PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
+            #define PTHREAD_RECURSIVE_MUTEX PTHREAD_MUTEX_RECURSIVE
+        #else
+            #define PTHREAD_RECURSIVE_MUTEX PTHREAD_MUTEX_RECURSIVE_NP
+        #endif
+    #endif
+    
+    #ifndef PTHREAD_ERRORCHECK_MUTEX_INITIALIZER
+        #ifdef PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP
+            #define PTHREAD_ERRORCHECK_MUTEX_INITIALIZER PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP
+        #else
+            #define PTHREAD_ERRORCHECK_MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
+        #endif
+    #endif
+    
+    #ifndef PTHREAD_RECURSIVE_MUTEX_INITIALIZER
+        #ifdef PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
+            #define PTHREAD_RECURSIVE_MUTEX_INITIALIZER PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP
+        #else
+            #define PTHREAD_RECURSIVE_MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
+        #endif
+    #endif
+
     LE_NOTHROW LE_COLD CriticalSection()
     #ifdef PTHREAD_RECURSIVE_MUTEX_INITIALIZER
         : mutex_( PTHREAD_RECURSIVE_MUTEX_INITIALIZER ) {}

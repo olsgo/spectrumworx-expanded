@@ -961,7 +961,7 @@ elseif ( CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang ) #...m
             endif()
         endif()
 
-    else() #...ANDROID...
+    elseif ( ANDROID ) #...ANDROID...
 
         #...mrmlj...add...%ANDROID_NDK%/toolchains/arm-linux-androideabi-4.8/prebuilt/windows-x86_64/bin/arm-linux-androideabi-strip --strip-unneeded  ./libs/armeabi-v7a/lib*.so
         #...mrmlj...-nodefaultlibs -lgcc -lc -lstdc++ -lc++_static -lm -ldl
@@ -1034,7 +1034,16 @@ elseif ( CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES Clang ) #...m
             "${stlPath}/libs/${ANDROID_NDK_ABI_NAME}/thumb"
             "${stlPath}/libs/${ANDROID_NDK_ABI_NAME}"
         )
-    endif() # APPLE | ANDROID
+        
+    else() # Linux and other Unix systems
+    
+        # Standard Unix/Linux build configuration - minimal changes for compatibility
+        set( LEB_SHARED_LINKER_FLAGS_RELEASE "${LEB_SHARED_LINKER_FLAGS_RELEASE} -Wl,--gc-sections -s" )
+        
+        # Use sensible defaults for Linux systems
+        message( STATUS "Building for Linux/Unix system (${CMAKE_SYSTEM_NAME} on ${CMAKE_SYSTEM_PROCESSOR})" )
+        
+    endif() # APPLE | ANDROID | Linux
 
     set( LEB_C_FLAGS_DEBUG
         "-O0 ${debugSymbolsCompilerSwitch} ${rttiOnSwitch} -DDEBUG=1 -D_DEBUG=1 -fstack-protector-all ${LEB_C_FLAGS_DEBUG}"

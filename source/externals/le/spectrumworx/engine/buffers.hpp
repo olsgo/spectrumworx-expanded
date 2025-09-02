@@ -27,6 +27,7 @@
 #include "boost/range/iterator_range_core.hpp"
 
 #include <array>
+#include <vector>
 //------------------------------------------------------------------------------
 namespace LE
 {

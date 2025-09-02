@@ -59,23 +59,25 @@ endif()
 if( NOT DEFINED ENV{LEB_3rdParty_root} )
     set( ENV{LEB_3rdParty_root} "${CMAKE_SOURCE_DIR}/../3rd_party" )
 endif()
-# Disable JUCE example and tool builds when using the bundled copy.
-set(JUCE_BUILD_EXTRAS OFF CACHE BOOL "" FORCE)
-set(JUCE_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(JUCE_BUILD_HELPER_TOOLS OFF CACHE BOOL "" FORCE)
-# Use JUCE's modern CMake build system.
-add_subdirectory("$ENV{LEB_3rdParty_root}/JUCE" JUCE-build)
 
-# Minimal helper to link required JUCE modules
+# TODO: Implement JUCE 8 integration properly - for now skip modern CMake integration
+# The bundled JUCE has version 8.0.3 but missing CMake support files
+# Disable JUCE example and tool builds when using the bundled copy.
+# set(JUCE_BUILD_EXTRAS OFF CACHE BOOL "" FORCE)
+# set(JUCE_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+# set(JUCE_BUILD_HELPER_TOOLS OFF CACHE BOOL "" FORCE)
+# Use JUCE's modern CMake build system.
+# add_subdirectory("$ENV{LEB_3rdParty_root}/JUCE" JUCE-build)
+
+# Temporary workaround: Use older JUCE integration method
+# Include JUCE headers manually for now
+include_directories(SYSTEM "$ENV{LEB_3rdParty_root}/JUCE/trunk/trunk")
+
+# Minimal helper to link required JUCE modules - simplified for now
 function(addJUCE target)
-    target_link_libraries(${target}
-        PRIVATE
-            juce::juce_core
-            juce::juce_data_structures
-            juce::juce_events
-            juce::juce_graphics
-            juce::juce_gui_basics
-    )
+    # For now, just include JUCE headers - libraries will be handled by the existing LE system
+    target_include_directories(${target} SYSTEM PRIVATE "$ENV{LEB_3rdParty_root}/JUCE/trunk/trunk")
+    message(STATUS "JUCE integration - using header-only approach for target: ${target}")
 endfunction()
 
 # Force-include LE configuration header so LE_IMPL_NAMESPACE_* macros are defined
@@ -691,7 +693,7 @@ if ( APPLE )
 	#"ln -s Library/Audio/Plug-Ins/VST/${LE_PROJECT_NAME}.vst Library/Audio/Plug-Ins/Components/${LE_PROJECT_NAME}.component/Contents/Resources/${LE_PROJECT_NAME}.vst"
     #)
 
-else() # Windows
+elseif ( WIN32 ) # Windows
     # WiX
     #  http://wixtoolset.org
     #  http://www.joyofsetup.com
@@ -815,6 +817,15 @@ else() # Windows
 
     set( LE_SW_DEFAULT_SHARED_DIRECTORY  "${programFiles}\\${sharedDirectory}"        )
     set( LE_SW_DEFAULT_PRESETS_DIRECTORY "${LE_SW_DEFAULT_SHARED_DIRECTORY}\\Presets" )
+
+else() # Linux and other Unix systems
+
+    # Basic configuration for non-Apple, non-Windows systems
+    message( STATUS "Configuring for Unix/Linux system" )
+    
+    # Set simple defaults for shared directories on Unix systems
+    set( LE_SW_DEFAULT_SHARED_DIRECTORY  "/usr/local/share/SpectrumWorx" )
+    set( LE_SW_DEFAULT_PRESETS_DIRECTORY "${LE_SW_DEFAULT_SHARED_DIRECTORY}/Presets" )
 
 endif() # OS
 

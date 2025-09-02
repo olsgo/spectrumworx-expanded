@@ -13,6 +13,8 @@
 //------------------------------------------------------------------------------
 #include "abi.hpp"
 
+#include <cstdint>
+
 #include <boost/config.hpp>
 #include <boost/utility/string_ref.hpp>
 

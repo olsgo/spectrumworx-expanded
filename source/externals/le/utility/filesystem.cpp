@@ -51,10 +51,10 @@ namespace
 
 LE_NOTHROWNOALIAS File::MemoryMapping::MemoryMapping() {}
 LE_NOTHROWNOALIAS File::MemoryMapping::MemoryMapping( Range const & range ) : Range( range ) {}
-LE_NOTHROW        File::MemoryMapping::MemoryMapping( MemoryMapping && other ) : Range( other ) { static_cast<Range &>( other ) = Range(); }
+LE_NOTHROW        File::MemoryMapping::MemoryMapping( MemoryMapping && other ) LE_NOEXCEPT : Range( other ) { static_cast<Range &>( other ) = Range(); }
 LE_NOTHROW        File::MemoryMapping::~MemoryMapping() { unmap( *this ); }
 
-LE_NOTHROW File::MemoryMapping & File::MemoryMapping::operator=( File::MemoryMapping && other )
+LE_NOTHROW File::MemoryMapping & File::MemoryMapping::operator=( File::MemoryMapping && other ) LE_NOEXCEPT
 {
     unmap( *this );
     static_cast<Range &>( *this ) = static_cast<Range const &>( other );
@@ -69,7 +69,7 @@ namespace
 
 LE_NOTHROWNOALIAS File::Stream::Stream(                          ) : handle_( invalidHandle  ) {}
 LE_NOTHROWNOALIAS File::Stream::Stream( int const fileDescriptor ) : handle_( fileDescriptor ) {}
-LE_NOTHROW        File::Stream::Stream( Stream && other          ) : handle_( other.handle_ ) { other.handle_ = -1; }
+LE_NOTHROW        File::Stream::Stream( Stream && other          ) LE_NOEXCEPT : handle_( other.handle_ ) { other.handle_ = -1; }
 LE_NOTHROW        File::Stream::~Stream() { close(); }
 
 LE_NOTHROW LE_COLD
@@ -84,7 +84,7 @@ void File::Stream::close()
 
 LE_NOTHROWNOALIAS bool File::Stream::operator! () const { return handle_ == invalidHandle; }
 
-LE_NOTHROW File::Stream & File::Stream::operator=( File::Stream && other )
+LE_NOTHROW File::Stream & File::Stream::operator=( File::Stream && other ) LE_NOEXCEPT
 {
     close();
     this->handle_ = other.handle_;

@@ -13,7 +13,13 @@
 //------------------------------------------------------------------------------
 #include "le/utility/platformSpecifics.hpp"
 
-#include "juce/juce_core/juce_core.h"
+// JUCE configuration - needed before including JUCE headers
+#define JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED 1
+#define JUCE_MODULE_AVAILABLE_juce_core 1
+#define JUCE_DISPLAY_SPLASH_SCREEN 0
+#define JUCE_USE_DARK_SPLASH_SCREEN 0
+
+#include "../3rd_party/JUCE/trunk/trunk/modules/juce_core/juce_core.h"
 
 #include <boost/range/iterator_range_core.hpp>
 #include <boost/smart_ptr/scoped_array.hpp>
