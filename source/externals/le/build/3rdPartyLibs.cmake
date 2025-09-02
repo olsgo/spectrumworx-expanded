@@ -8,6 +8,11 @@
 
 cmake_minimum_required( VERSION 3.10 )  # Updated for macOS Sequoia compatibility
 
+# Handle modern CMake policies
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 OLD)  # Continue using FindBoost module for now
+endif()
+
 include( "${CMAKE_CURRENT_LIST_DIR}/utilities.cmake" )
 
 function( add3rdPartyLib name minimumVersion downloadVersion downloadURL downloadedFileName downloadHash versionSubDirectory )
