@@ -12,6 +12,8 @@
 #include "tchar.hpp"
 #include "trace.hpp"
 
+#include <csignal>  // For SIGINT and raise
+
 #include "boost/assert.hpp"
 #ifdef LE_PUBLIC_BUILD
 #include "boost/concept_check.hpp"

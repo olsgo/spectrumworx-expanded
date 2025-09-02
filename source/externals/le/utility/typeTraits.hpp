@@ -14,7 +14,9 @@
 #define typeTraits_hpp__45496FE2_5F16_4115_8225_39355C7AB4D5
 #pragma once
 //------------------------------------------------------------------------------
-#include "boost/tr1/detail/config_all.hpp"
+// Temporarily disable Boost TR1 integration for modern GCC compatibility
+// TODO: Replace with modern Boost type traits when updating Boost
+//#include "boost/tr1/detail/config_all.hpp"
 
 #include <ciso646>
 
@@ -71,7 +73,8 @@ LE_AUX_TYPE_TRAITS_NAMESPACE_BEGIN()
     template <typename T> struct is_trivially_destructible         <T * LE_RESTRICT> : true_type {};
 #elif ( __GLIBCXX__ >= 20110325 )
     template <typename T> struct is_trivially_destructible         <T * LE_RESTRICT> : true_type {};
-    template <typename T> struct has_trivial_default_constructor   <T * LE_RESTRICT> : true_type {};
+    // Use modern type trait name instead of deprecated has_trivial_default_constructor
+    template <typename T> struct is_trivially_default_constructible<T * LE_RESTRICT> : true_type {};
 #elif defined( __GLIBCXX__ ) && defined( BOOST_HAS_TR1_TYPE_TRAITS )
     template <typename T> struct has_trivial_destructor            <T * LE_RESTRICT> : true_type {};
 #endif // STL
