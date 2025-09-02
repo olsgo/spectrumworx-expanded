@@ -48,14 +48,16 @@ public: // LE::Algorithm required interface.
     // Parameters
     ////////////////////////////////////////////////////////////////////////////
 
-    LE_ENUMERATED_PARAMETER( ConvolutionType, ( Triggered )( Continuous ) );
-    LE_ENUMERATED_PARAMETER( Phase          , ( Sum )( Side )( Main )     );
+    enum ConvolutionTypeValue { Triggered, Continuous };
+    class ConvolutionType : public LE::Parameters::EnumeratedParameter<2> {};
+    enum PhaseValue { Sum, Side, Main };
+    class Phase : public LE::Parameters::EnumeratedParameter<3> {};
+    class GrabIR : public TriggerParameter {};
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( ConvolutionType )                     )
-        ( ( GrabIR          )( TriggerParameter ) )
-        ( ( Phase           )                     )
+    LE_DEFINE_PARAMETERS(
+        ConvolutionType,
+        GrabIR,
+        Phase
     );
 
     /// \typedef ConvolutionType

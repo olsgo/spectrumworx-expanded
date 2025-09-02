@@ -46,16 +46,19 @@ namespace Effects
 
 struct Octaver
 {
-    LE_ENUMERATED_PARAMETER( Octave1, ( Down2 )( Down1 )( Off ) ( Up1 ) ( Up2 ) );
-    LE_ENUMERATED_PARAMETER( Octave2, ( Down2 )( Down1 )( Off ) ( Up1 ) ( Up2 ) );
+    enum OctaveValue { Down2, Down1, Off, Up1, Up2 };
+    class Octave1 : public LE::Parameters::EnumeratedParameter<5> {};
+    class Octave2 : public LE::Parameters::EnumeratedParameter<5> {};
+    class GainOctave1 : public LinearFloat::Modify<Traits::Minimum<-48>, Traits::Maximum<+24>, Traits::Default<0>, Traits::Unit<' dB'>> {};
+    class GainOctave2 : public LinearFloat::Modify<Traits::Minimum<-48>, Traits::Maximum<+24>, Traits::Default<0>, Traits::Unit<' dB'>> {};
+    class CutoffFrequency : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<16000>, Traits::Default<350>, Traits::Unit<' Hz'>> {};
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Octave1 ) )
-        ( ( GainOctave1     )( LinearFloat           )( Minimum<-48> )( Maximum<  +24> )( Default<  0>)( Unit<' dB'> ) )
-        ( ( Octave2 ) )
-        ( ( GainOctave2     )( LinearFloat           )( Minimum<-48> )( Maximum<  +24> )( Default<  0>)( Unit<' dB'> ) )
-        ( ( CutoffFrequency )( LinearUnsignedInteger )( Minimum<  0> )( Maximum<16000> )( Default<350>)( Unit<' Hz'> ) )
+    LE_DEFINE_PARAMETERS(
+        Octave1,
+        GainOctave1,
+        Octave2,
+        GainOctave2,
+        CutoffFrequency
     );
 
     /// \typedef Octave1

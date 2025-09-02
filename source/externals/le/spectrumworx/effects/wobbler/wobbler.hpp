@@ -36,18 +36,21 @@ namespace Effects
 ///
 /// \brief Input spectrum amplitude sine modulation.
 ///
-/// This module creates a sinusoidal-based “wobbling” sound by changing the 
+/// This module creates a sinusoidal-based ï¿½wobblingï¿½ sound by changing the 
 /// amplitudes of the input frequencies. 
 /// 
 ////////////////////////////////////////////////////////////////////////////////
 
 struct Wobbler
 {
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Amplitude )( LinearFloat           )( Minimum< 0> )( Maximum< +48> )( Default<  6> )( Unit<' dB'> ) )
-        ( ( Period    )( LinearUnsignedInteger )( Minimum<10> )( Maximum<1000> )( Default<100> )( Unit<' ms'> ) )
-        ( ( PreGain   )( SymmetricFloat        )( MaximumOffset<48> )                           ( Unit<' dB'> ) )
+    class Amplitude : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<48>, Traits::Default<6>, Traits::Unit<' dB'>> {};
+    class Period : public LinearUnsignedInteger::Modify<Traits::Minimum<10>, Traits::Maximum<1000>, Traits::Default<100>, Traits::Unit<' ms'>> {};
+    class PreGain : public SymmetricFloat::Modify<Traits::MaximumOffset<48>, Traits::Unit<' dB'>> {};
+
+    LE_DEFINE_PARAMETERS(
+        Amplitude,
+        Period,
+        PreGain
     );
 
     /// \typedef Amplitude

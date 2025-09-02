@@ -45,11 +45,14 @@ namespace Effects
 
 struct AhAh
 {
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Center   )( LinearUnsignedInteger )( Minimum< 0> )( Maximum<6000> )( Default<2000> )( Unit<' Hz'> ) )
-        ( ( Width    )( LinearUnsignedInteger )( Minimum<50> )( Maximum<2000> )( Default<1000> )( Unit<' Hz'> ) )
-        ( ( Strength )( SymmetricFloat        )( MaximumOffset<24> )                            ( Unit<' dB'> ) )
+    class Center : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<6000>, Traits::Default<2000>, Traits::Unit<' Hz'>> {};
+    class Width : public LinearUnsignedInteger::Modify<Traits::Minimum<50>, Traits::Maximum<2000>, Traits::Default<1000>, Traits::Unit<' Hz'>> {};
+    class Strength : public SymmetricFloat::Modify<Traits::MaximumOffset<24>, Traits::Unit<' dB'>> {};
+
+    LE_DEFINE_PARAMETERS(
+        Center,
+        Width,
+        Strength
     );
 
     /// \typedef Center

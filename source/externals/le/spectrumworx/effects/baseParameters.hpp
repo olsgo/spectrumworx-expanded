@@ -46,13 +46,18 @@ namespace BaseParameters
 /// \brief Basic parameters included by all effects
 /// @{
 
-LE_DEFINE_PARAMETERS
-(
-    ( ( Bypass         )( Boolean        )                                                              )
-    ( ( Gain           )( SymmetricFloat )( MaximumOffset<20> )                         ( Unit<' dB'> ) )
-    ( ( Wet            )( LinearFloat    )( Minimum<0> )( Maximum<100> )( Default<100> )( Unit<' %' > ) )
-    ( ( StartFrequency )( LinearFloat    )( Minimum<0> )( Maximum<  1> )( Default<  0> )                )
-    ( ( StopFrequency  )( LinearFloat    )( Minimum<0> )( Maximum<  1> )( Default<  1> )                )
+class Bypass : public Boolean {};
+class Gain : public SymmetricFloat::Modify<Traits::MaximumOffset<20>, Traits::Unit<' dB'>> {};
+class Wet : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<100>, Traits::Default<100>, Traits::Unit<' %'>> {};
+class StartFrequency : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<1>, Traits::Default<0>> {};
+class StopFrequency : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<1>, Traits::Default<1>> {};
+
+LE_DEFINE_PARAMETERS(
+    Bypass,
+    Gain,
+    Wet,
+    StartFrequency,
+    StopFrequency
 );
 
 /// \typedef Parameters

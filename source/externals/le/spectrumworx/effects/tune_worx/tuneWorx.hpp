@@ -40,63 +40,63 @@ namespace Detail
         typedef CommonParameters::SpringType SpringType;
         /// @}
 
-        LE_ENUMERATED_PARAMETER( Key, ( A )( Ais )( B )( C )( Cis )( D )( Dis )( E )( F )( Fis )( G )( Gis ) );
+        enum KeyValue { A, Ais, B, C, Cis, D, Dis, E, F, Fis, G, Gis };
+        class Key : public LE::Parameters::EnumeratedParameter<12> {};
 
     #ifndef LE_SIMPLE_TUNEWORX
-        LE_DEFINE_PARAMETERS
-        (
-            ( ( Key           ) )
-			( ( SpringType    ) )
-            ( ( Semi01        ) ( Boolean ) )
-            ( ( Semi02        ) ( Boolean ) )
-            ( ( Semi03        ) ( Boolean ) )
-            ( ( Semi04        ) ( Boolean ) )
-            ( ( Semi05        ) ( Boolean ) )
-            ( ( Semi06        ) ( Boolean ) )
-            ( ( Semi07        ) ( Boolean ) )
-            ( ( Semi08        ) ( Boolean ) )
-            ( ( Semi09        ) ( Boolean ) )
-            ( ( Semi10        ) ( Boolean ) )
-            ( ( Semi11        ) ( Boolean ) )
-            ( ( Semi12        ) ( Boolean ) )
-            ( ( BypassSemi01  ) ( Boolean ) )
-            ( ( BypassSemi02  ) ( Boolean ) )
-            ( ( BypassSemi03  ) ( Boolean ) )
-            ( ( BypassSemi04  ) ( Boolean ) )
-            ( ( BypassSemi05  ) ( Boolean ) )
-            ( ( BypassSemi06  ) ( Boolean ) )
-            ( ( BypassSemi07  ) ( Boolean ) )
-            ( ( BypassSemi08  ) ( Boolean ) )
-            ( ( BypassSemi09  ) ( Boolean ) )
-            ( ( BypassSemi10  ) ( Boolean ) )
-            ( ( BypassSemi11  ) ( Boolean ) )
-            ( ( BypassSemi12  ) ( Boolean ) )
-            ( ( Vibrato       ) ( Boolean ) )
-            ( ( PitchMinFreq  ) ( LinearFloat           ) ( Minimum< 50> ) ( Maximum< 2000> ) ( Default<  70> ) ( Unit<'Hz'> ) )
-            ( ( PitchMaxFreq  ) ( LinearFloat           ) ( Minimum<100> ) ( Maximum<10000> ) ( Default<2000> ) ( Unit<'Hz'> ) )
-            ( ( TuneTolerance ) ( LinearFloat           ) ( Minimum<  0> ) ( Maximum<   50> ) ( Default<   0> ) ( Unit<'Hz'> ) )
-            ( ( RetuneTime    ) ( LinearUnsignedInteger ) ( Minimum<  0> ) ( Maximum<  500> ) ( Default<  50> ) ( Unit<'ms'> ) )
-            ( ( VibratoDelay  ) ( LinearUnsignedInteger ) ( Minimum<  0> ) ( Maximum< 1000> ) ( Default< 100> ) ( Unit<'ms'> ) )
-            ( ( VibratoPeriod ) ( LinearUnsignedInteger ) ( Minimum< 10> ) ( Maximum<  250> ) ( Default< 100> ) ( Unit<'ms'> ) )
-            ( ( VibratoDepth  ) ( LinearUnsignedInteger ) ( Minimum<  0> ) ( Maximum<  100> ) ( Default<  50> ) ( Unit<'\"'> ) )
-            ( ( PitchShift    ) ( SymmetricInteger      ) ( MaximumOffset<1200> )             ( Default<   0> ) ( Unit<'\"'> ) )
+        class Semi01 : public Boolean {};
+        class Semi02 : public Boolean {};
+        class Semi03 : public Boolean {};
+        class Semi04 : public Boolean {};
+        class Semi05 : public Boolean {};
+        class Semi06 : public Boolean {};
+        class Semi07 : public Boolean {};
+        class Semi08 : public Boolean {};
+        class Semi09 : public Boolean {};
+        class Semi10 : public Boolean {};
+        class Semi11 : public Boolean {};
+        class Semi12 : public Boolean {};
+        class BypassSemi01 : public Boolean {};
+        class BypassSemi02 : public Boolean {};
+        class BypassSemi03 : public Boolean {};
+        class BypassSemi04 : public Boolean {};
+        class BypassSemi05 : public Boolean {};
+        class BypassSemi06 : public Boolean {};
+        class BypassSemi07 : public Boolean {};
+        class BypassSemi08 : public Boolean {};
+        class BypassSemi09 : public Boolean {};
+        class BypassSemi10 : public Boolean {};
+        class BypassSemi11 : public Boolean {};
+        class BypassSemi12 : public Boolean {};
+        class Vibrato : public Boolean {};
+        class PitchMinFreq : public LinearFloat::Modify<Traits::Minimum<50>, Traits::Maximum<2000>, Traits::Default<70>, Traits::Unit<'Hz'>> {};
+        class PitchMaxFreq : public LinearFloat::Modify<Traits::Minimum<100>, Traits::Maximum<10000>, Traits::Default<2000>, Traits::Unit<'Hz'>> {};
+        class TuneTolerance : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<50>, Traits::Default<0>, Traits::Unit<'Hz'>> {};
+        class RetuneTime : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<500>, Traits::Default<50>, Traits::Unit<'ms'>> {};
+        class VibratoDelay : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<1000>, Traits::Default<100>, Traits::Unit<'ms'>> {};
+        class VibratoPeriod : public LinearUnsignedInteger::Modify<Traits::Minimum<10>, Traits::Maximum<250>, Traits::Default<100>, Traits::Unit<'ms'>> {};
+        class VibratoDepth : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<100>, Traits::Default<50>, Traits::Unit<'"'>> {};
+        class PitchShift : public SymmetricInteger::Modify<Traits::MaximumOffset<1200>, Traits::Default<0>, Traits::Unit<'"'>> {};
+
+        LE_DEFINE_PARAMETERS(
+            Key,
+            SpringType,
+            Semi01, Semi02, Semi03, Semi04, Semi05, Semi06, Semi07, Semi08, Semi09, Semi10, Semi11, Semi12,
+            BypassSemi01, BypassSemi02, BypassSemi03, BypassSemi04, BypassSemi05, BypassSemi06, BypassSemi07, BypassSemi08, BypassSemi09, BypassSemi10, BypassSemi11, BypassSemi12,
+            Vibrato,
+            PitchMinFreq,
+            PitchMaxFreq,
+            TuneTolerance,
+            RetuneTime,
+            VibratoDelay,
+            VibratoPeriod,
+            VibratoDepth,
+            PitchShift
         );
     #else // LE_SIMPLE_TUNEWORX
-        LE_DEFINE_PARAMETERS
-        (
-            ( ( Key    ) )
-            ( ( Semi01 ) ( Boolean ) )
-            ( ( Semi02 ) ( Boolean ) )
-            ( ( Semi03 ) ( Boolean ) )
-            ( ( Semi04 ) ( Boolean ) )
-            ( ( Semi05 ) ( Boolean ) )
-            ( ( Semi06 ) ( Boolean ) )
-            ( ( Semi07 ) ( Boolean ) )
-            ( ( Semi08 ) ( Boolean ) )
-            ( ( Semi09 ) ( Boolean ) )
-            ( ( Semi10 ) ( Boolean ) )
-            ( ( Semi11 ) ( Boolean ) )
-            ( ( Semi12 ) ( Boolean ) )
+        LE_DEFINE_PARAMETERS(
+            Key,
+            Semi01, Semi02, Semi03, Semi04, Semi05, Semi06, Semi07, Semi08, Semi09, Semi10, Semi11, Semi12
         );
     #endif // LE_SIMPLE_TUNEWORX
 

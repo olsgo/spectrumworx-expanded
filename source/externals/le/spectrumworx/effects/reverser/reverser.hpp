@@ -42,9 +42,10 @@ namespace Effects
 
 struct Reverser
 {
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Length )( LinearUnsignedInteger )( Minimum<1> )( Maximum<5000> )( Default<1000> )( Unit<' ms'> ) )
+    class Length : public LinearUnsignedInteger::Modify<Traits::Minimum<1>, Traits::Maximum<5000>, Traits::Default<1000>, Traits::Unit<' ms'>> {};
+
+    LE_DEFINE_PARAMETERS(
+        Length
     );
 
     /// \typedef Length

@@ -24,7 +24,7 @@
 
 #include "le/math/conversion.hpp"
 #include "le/math/math.hpp"
-#include "le/parameters/fusionAdaptors.hpp"
+
 #include "le/parameters/lfo.hpp"
 #include "le/parameters/uiElements.hpp" //...mrmlj...only for the warnAboutMissingParameter() temporary workaround
 #include "le/spectrumworx/effects/configuration/effectNames.hpp"

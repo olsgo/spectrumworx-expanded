@@ -22,7 +22,7 @@
 #include "le/parameters/printer.hpp" // printers for module parameters
 #include "le/parameters/uiElements.hpp"
 #endif // LE_SW_SDK_BUILD
-#include "le/parameters/fusionAdaptors.hpp"
+
 #include "le/parameters/trigger/tag.hpp"
 #include "le/spectrumworx/effects/effects.hpp"
 #include "le/spectrumworx/engine/channelData.hpp"

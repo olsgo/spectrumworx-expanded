@@ -46,9 +46,10 @@ namespace Effects
 
 struct Armonizer
 {
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Interval )( SymmetricFloat )( MaximumOffset<24> )( Unit<'\''> ) )
+    class Interval : public SymmetricFloat::Modify<Traits::MaximumOffset<24>, Traits::Unit<'">> {};
+
+    LE_DEFINE_PARAMETERS(
+        Interval
     );
 
     /// \typedef Interval

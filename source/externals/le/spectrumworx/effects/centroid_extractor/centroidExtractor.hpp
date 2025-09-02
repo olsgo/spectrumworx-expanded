@@ -48,13 +48,15 @@ namespace Effects
 
 struct CentroidExtractor
 {
-    LE_ENUMERATED_PARAMETER( Mode, ( Centroid )( Peak )( Dominant ) );
+    enum Mode { Centroid, Peak, Dominant };
+    class ModeParameter : public LE::Parameters::EnumeratedParameter<3> {};
+    class Bandwidth : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<6000>, Traits::Default<1000>, Traits::Unit<' Hz'>> {};
+    class Attenuation : public LinearSignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<100>, Traits::Default<10>, Traits::Unit<' dB'>> {};
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Mode        ) )
-        ( ( Bandwidth   )( LinearUnsignedInteger )( Minimum<0> )( Maximum<6000> )( Default<1000> )( Unit<' Hz'> ) )
-        ( ( Attenuation )( LinearSignedInteger   )( Minimum<0> )( Maximum< 100> )( Default<  10> )( Unit<' dB'> ) )
+    LE_DEFINE_PARAMETERS(
+        ModeParameter,
+        Bandwidth,
+        Attenuation
     );
 
     /// \typedef Mode

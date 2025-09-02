@@ -46,14 +46,16 @@ namespace Effects
 
 struct Vaxateer
 {
-    LE_ENUMERATED_PARAMETER( RMSTarget, ( MainRMS )( SideRMS )                           );
-    LE_ENUMERATED_PARAMETER( Mode     , ( M1 )( M2 )( M3 )( M4 )( M5 )( M6 )( M7 )( M8 ) );
+    enum RMSTargetValue { MainRMS, SideRMS };
+    class RMSTarget : public LE::Parameters::EnumeratedParameter<2> {};
+    enum ModeValue { M1, M2, M3, M4, M5, M6, M7, M8 };
+    class Mode : public LE::Parameters::EnumeratedParameter<8> {};
+    class RMSGain : public SymmetricInteger::Modify<Traits::MaximumOffset<24>, Traits::Unit<' dB'>> {};
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( RMSTarget ) )
-        ( ( RMSGain   ) ( SymmetricInteger )( MaximumOffset<24> )( Unit<' dB'> ) )  
-        ( ( Mode      ) )
+    LE_DEFINE_PARAMETERS(
+        RMSTarget,
+        RMSGain,
+        Mode
     );
 
     /// \typedef RMSTarget

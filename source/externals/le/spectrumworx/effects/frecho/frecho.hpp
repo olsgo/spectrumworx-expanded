@@ -54,11 +54,14 @@ private:
     typedef boost::mpl::string<' \'/e', 'cho'> SemitonesPerEcho;
 
 public:
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Distance   )( LinearUnsignedInteger )( Minimum< 17> )( Maximum<500> )( Default<100> )( Unit <            ' m'> ) )
-        ( ( Absorption )( LinearFloat           )( Minimum<  0> )( Maximum< 18> )( Default<  6> )( Unit <           ' dB'> ) )
-        ( ( EchoPitch  )( SymmetricFloat        )( MaximumOffset<12> )                           ( Unit2<SemitonesPerEcho> ) )
+    class Distance : public LinearUnsignedInteger::Modify<Traits::Minimum<17>, Traits::Maximum<500>, Traits::Default<100>, Traits::Unit<' m'>> {};
+    class Absorption : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<18>, Traits::Default<6>, Traits::Unit<' dB'>> {};
+    class EchoPitch : public SymmetricFloat::Modify<Traits::MaximumOffset<12>, Traits::Unit2<SemitonesPerEcho>> {};
+
+    LE_DEFINE_PARAMETERS(
+        Distance,
+        Absorption,
+        EchoPitch
     );
 
     /// \typedef Distance

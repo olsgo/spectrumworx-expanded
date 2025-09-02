@@ -22,7 +22,7 @@
 
 #ifndef _MSC_VER // for eager compilers
     #include "le/math/conversion.hpp"
-    #include "le/parameters/fusionAdaptors.hpp"
+    
     #include "le/spectrumworx/engine/parameters.hpp"
 #endif // _MSC_VER
 #include "le/utility/countof.hpp"

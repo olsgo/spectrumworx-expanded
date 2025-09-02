@@ -32,10 +32,13 @@ namespace Detail
 {
     struct PitchMagnetBase
     {
-        LE_DEFINE_PARAMETERS
-        (
-            ( ( Target ) ( LinearUnsignedInteger )( Minimum< 20> )( Maximum<2000> )( Default<200> )( Unit<' Hz'  > ) )
-            ( ( Speed  ) ( LinearFloat           )( Minimum<  0> )( Maximum<  60> )( Default<  1> )( Unit<' \'/s'> ) )
+        class Target : public LinearUnsignedInteger::Modify<Traits::Minimum<20>, Traits::Maximum<2000>, Traits::Default<200>, Traits::Unit<' Hz'>> {};
+        class Speed : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<60>, Traits::Default<1>, Traits::Unit<' 
+/s'>> {};
+
+        LE_DEFINE_PARAMETERS(
+            Target,
+            Speed
         );
 
         /// \typedef Target

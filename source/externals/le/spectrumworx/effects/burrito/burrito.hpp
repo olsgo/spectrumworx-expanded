@@ -44,14 +44,17 @@ namespace Effects
 
 struct Burrito
 {
-    LE_ENUMERATED_PARAMETER( Mode, ( Replace )( Sum ) );
+    enum Mode { Replace, Sum };
+    class ModeParameter : public LE::Parameters::EnumeratedParameter<2> {};
+    class Range : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<100>, Traits::Default<50>, Traits::Unit<' bw%'>> {};
+    class Period : public LinearUnsignedInteger::Modify<Traits::Minimum<10>, Traits::Maximum<2000>, Traits::Default<250>, Traits::Unit<' ms'>> {};
+    class SideGain : public SymmetricInteger::Modify<Traits::MaximumOffset<24>, Traits::Unit<' dB'>> {};
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Mode     )                                                                                          )
-        ( ( Range    )( LinearUnsignedInteger )( Minimum< 0> )( Maximum< 100> )( Default< 50> )( Unit<' bw%'> ) )
-        ( ( Period   )( LinearUnsignedInteger )( Minimum<10> )( Maximum<2000> )( Default<250> )( Unit<' ms' > ) )
-        ( ( SideGain )( SymmetricInteger      )( MaximumOffset<24> )                           ( Unit<' dB' > ) )
+    LE_DEFINE_PARAMETERS(
+        ModeParameter,
+        Range,
+        Period,
+        SideGain
     );
 
     /// \typedef Mode

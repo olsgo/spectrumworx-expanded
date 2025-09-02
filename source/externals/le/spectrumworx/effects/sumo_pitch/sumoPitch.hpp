@@ -46,11 +46,15 @@ namespace Effects
 
 struct SumoPitch
 {
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Blend )( LinearUnsignedInteger )( Minimum<0> )( Maximum<100> )( Default<50> )( Unit<' %'>    ) )
-        ( ( Speed )( LinearFloat           )( Minimum<0> )( Maximum< 60> )( Default< 1> )( Unit<' \'/s'> ) )
+    class Blend : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<100>, Traits::Default<50>, Traits::Unit<' %'> > {};
+    class Speed : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<60>, Traits::Default<1>, Traits::Unit<' 
+/s'>> {};
+
+    LE_DEFINE_PARAMETERS(
+        Blend,
+        Speed
     );
+;
 
     /// \typedef Blend
     /// \brief Controls the amount of blending between main and side channel

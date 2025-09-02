@@ -44,9 +44,10 @@ namespace Effects
 
 struct Phasevolution
 {
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( PhasePeriod ) ( LinearFloat )( Minimum<1> )( Maximum<5000> )( Default<500> )( ValuesDenominator<1000> )( Unit<' s'> ) )
+    class PhasePeriod : public LinearFloat::Modify<Traits::Minimum<1>, Traits::Maximum<5000>, Traits::Default<500>, Traits::ValuesDenominator<1000>, Traits::Unit<' s'>> {};
+
+    LE_DEFINE_PARAMETERS(
+        PhasePeriod
     );
 
     /// \typedef PhasePeriod

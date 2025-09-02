@@ -44,11 +44,14 @@ namespace Effects
 
 struct QuietBoost
 {
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Threshold          )( LinearFloat )( Minimum<-60> )( Maximum< 0> )( Default< -25> )( Unit<' dB'> ) )        
-        ( ( Ratio              )( LinearFloat )( Minimum<  1> )( Maximum<15> )( Default<   3> )                )
-        ( ( NoiseGateThreshold )( LinearFloat )( Minimum<-60> )( Maximum< 0> )( Default< -45> )( Unit<' dB'> ) )        
+    class Threshold : public LinearFloat::Modify<Traits::Minimum<-60>, Traits::Maximum<0>, Traits::Default<-25>, Traits::Unit<' dB'>> {};
+    class Ratio : public LinearFloat::Modify<Traits::Minimum<1>, Traits::Maximum<15>, Traits::Default<3>> {};
+    class NoiseGateThreshold : public LinearFloat::Modify<Traits::Minimum<-60>, Traits::Maximum<0>, Traits::Default<-45>, Traits::Unit<' dB'>> {};
+
+    LE_DEFINE_PARAMETERS(
+        Threshold,
+        Ratio,
+        NoiseGateThreshold
     );
 
     /// \typedef Threshold

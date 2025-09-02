@@ -42,9 +42,10 @@ namespace Effects
 
 struct Blender
 {
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Amount )( LinearUnsignedInteger )( Minimum<0> )( Maximum<100> )( Default<30> )( Unit<' %'> ) )
+    class Amount : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<100>, Traits::Default<30>, Traits::Unit<' %'> > {};
+
+    LE_DEFINE_PARAMETERS(
+        Amount
     );
 
     /// \typedef Amount

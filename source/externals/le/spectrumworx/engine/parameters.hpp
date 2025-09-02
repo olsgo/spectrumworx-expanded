@@ -34,12 +34,8 @@ namespace GlobalParameters // Automated parameters
     using WindowFunction   = Engine::WindowFunction  ;
 
 #if LE_SW_ENGINE_INPUT_MODE >= 1
-    LE_ENUMERATED_PARAMETER
-    (
-        InputMode,
-        ( Stereo )( StereoSideChain )
-        ( Mono   )( MonoSideChain   )
-    );
+    enum InputModeValue { Stereo, StereoSideChain, Mono, MonoSideChain };
+    class InputMode : public LE::Parameters::EnumeratedParameter<4> {};
 #endif // LE_SW_ENGINE_INPUT_MODE
     //LE_ENUMERATED_PARAMETER( StreamMode, ( Always )( MIDITrigger )( MIDIGate ) ); // ...MIDI not supported yet
 
@@ -55,18 +51,23 @@ namespace GlobalParameters // Automated parameters
     #define LE_SW_INPUTMODE_PARAMETER()
 #endif // LE_SW_ENGINE_INPUT_MODE
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( InputGain     )( LE::Parameters::LinearFloat )( Minimum<1> )( Maximum<2000> )( Default<1000> )( ValuesDenominator<1000> ) )
-        ( ( OutputGain    )( InputGain                   )                                                                            )
-        ( ( MixPercentage )( LE::Parameters::LinearFloat )( Minimum<0> )( Maximum<1> )( Default<1> )                                  )
+    class InputGain : public LE::Parameters::LinearFloat::Modify<LE::Parameters::Traits::Minimum<1>, LE::Parameters::Traits::Maximum<2000>, LE::Parameters::Traits::Default<1000>, LE::Parameters::Traits::ValuesDenominator<1000>> {};
+    class OutputGain : public InputGain {};
+    class MixPercentage : public LE::Parameters::LinearFloat::Modify<LE::Parameters::Traits::Minimum<0>, LE::Parameters::Traits::Maximum<1>, LE::Parameters::Traits::Default<1>> {};
 
-        ( ( FFTSize        ) )
-        ( ( OverlapFactor  ) )
-        ( ( WindowFunction ) )
-        LE_SW_WINDOW_SIZEFACTOR_PARAMETER()
-        LE_SW_INPUTMODE_PARAMETER()
-      //( ( StreamMode     ) ) // ...MIDI not supported yet
+    LE_DEFINE_PARAMETERS(
+        InputGain,
+        OutputGain,
+        MixPercentage,
+        FFTSize,
+        OverlapFactor,
+        WindowFunction
+#if LE_SW_ENGINE_WINDOW_PRESUM
+        , WindowSizeFactor
+#endif // LE_SW_ENGINE_WINDOW_PRESUM
+#if LE_SW_ENGINE_INPUT_MODE >= 1
+        , InputMode
+#endif // LE_SW_ENGINE_INPUT_MODE
     );
 
     #undef LE_SW_WINDOW_SIZEFACTOR_PARAMETER

@@ -44,11 +44,14 @@ namespace Effects
 
 struct Sharper
 {
-    LE_DEFINE_PARAMETERS
-    (        
-        ( ( AveragingWidth )( LinearUnsignedInteger )( Minimum<  0> )( Maximum<5000> )( Default<1000> )( Unit<' Hz'> ) )
-        ( ( Intensity      )( LinearFloat           )( Minimum<  0> )( Maximum< +72> )( Default<  20> )( Unit<' dB'> ) )
-        ( ( Limiter        )( LinearFloat           )( Minimum<-80> )( Maximum<   0> )( Default< -20> )( Unit<' dB'> ) )
+    class AveragingWidth : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<5000>, Traits::Default<1000>, Traits::Unit<' Hz'>> {};
+    class Intensity : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<72>, Traits::Default<20>, Traits::Unit<' dB'>> {};
+    class Limiter : public LinearFloat::Modify<Traits::Minimum<-80>, Traits::Maximum<0>, Traits::Default<-20>, Traits::Unit<' dB'>> {};
+
+    LE_DEFINE_PARAMETERS(
+        AveragingWidth,
+        Intensity,
+        Limiter
     );
 
     /// \typedef AveragingWidth

@@ -50,12 +50,13 @@ private:
     typedef boost::mpl::string<' dB/', 's'> DecibelsPerSecond;
 
 public:
-    LE_ENUMERATED_PARAMETER( Direction, ( RiseFall )( Rise )( Fall ) );
+    enum DirectionValue { RiseFall, Rise, Fall };
+    class Direction : public LE::Parameters::EnumeratedParameter<3> {};
+    class SlewRate : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<300>, Traits::Default<50>, Traits::Unit2<DecibelsPerSecond>> {};
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Direction ) ) 
-        ( ( SlewRate  ) ( LinearFloat )( Minimum<0> )( Maximum<300> )( Default<50> )( Unit2<DecibelsPerSecond> ) )
+    LE_DEFINE_PARAMETERS(
+        Direction,
+        SlewRate
     );
     
     /// \typedef Direction

@@ -46,9 +46,10 @@ namespace Effects
 
 struct Exaggerator
 {
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Exaggerate )( SymmetricFloat )( MaximumOffset<100> )( Unit<' %'> ) )
+    class Exaggerate : public SymmetricFloat::Modify<Traits::MaximumOffset<100>, Traits::Unit<' %'> > {};
+
+    LE_DEFINE_PARAMETERS(
+        Exaggerate
     );
 
     /// \typedef Exaggerate

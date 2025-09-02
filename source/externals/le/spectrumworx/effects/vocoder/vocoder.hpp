@@ -47,13 +47,15 @@ namespace Effects
 
 struct Vocoder
 {
-    LE_ENUMERATED_PARAMETER( FilterMethod, ( CepstrumUdoBrick )( CepstrumBrick )( CepstrumHamming )( MovingAverage )( Envelope )( MelEnvelope )( Passthrough ) );
+    enum FilterMethodValue { CepstrumUdoBrick, CepstrumBrick, CepstrumHamming, MovingAverage, Envelope, MelEnvelope, Passthrough };
+    class FilterMethod : public LE::Parameters::EnumeratedParameter<7> {};
+    class EnvelopeBorder : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<12000>, Traits::Default<1000>, Traits::Unit<' Hz'>> {};
+    class NoiseIntensity : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<100>, Traits::Default<0>, Traits::Unit<'%'>> {};
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( EnvelopeBorder )( LinearUnsignedInteger )( Minimum<  0> )( Maximum<12000> )( Default<1000> )( Unit<' Hz'> ) )
-        ( ( NoiseIntensity )( LinearUnsignedInteger )( Minimum<  0> )( Maximum<  100> )( Default<   0> )( Unit<' %' > ) )
-        ( ( FilterMethod ) )
+    LE_DEFINE_PARAMETERS(
+        EnvelopeBorder,
+        NoiseIntensity,
+        FilterMethod
     );
 
     /// \typedef EnvelopeBorder

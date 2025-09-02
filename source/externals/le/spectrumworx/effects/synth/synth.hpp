@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 ///
 /// \file synth.hpp
-/// ---------------
+/// --------------- 
 ///
 /// Copyright (c) 2015 - 2016. Little Endian Ltd. All rights reserved.
 ///
@@ -41,12 +41,16 @@ namespace Effects
 
 struct Synth
 {
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Frequency       ) ( LinearFloat           )( Minimum<40> )( Maximum<8000> )( Default<110> )               )
-        ( ( HarmonicSlope   ) ( LinearUnsignedInteger )( Minimum< 0> )( Maximum< 100> )( Default< 50> )( Unit< '%'> ) )
-        ( ( FlangeIntensity ) ( LinearUnsignedInteger )( Minimum< 0> )( Maximum< 100> )( Default<  0> )( Unit< '%'> ) )
-        ( ( FlangeOffset    ) ( SymmetricFloat        )( MaximumOffset<180> )          ( Default< 10> )( Unit< '°'> ) )
+    class Frequency : public LinearFloat::Modify<Traits::Minimum<40>, Traits::Maximum<8000>, Traits::Default<110>> {};
+    class HarmonicSlope : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<100>, Traits::Default<50>, Traits::Unit<'%'> > {};
+    class FlangeIntensity : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<100>, Traits::Default<0>, Traits::Unit<'%'> > {};
+    class FlangeOffset : public SymmetricFloat::Modify<Traits::MaximumOffset<180>, Traits::Default<10>, Traits::Unit<'Â°'>> {};
+
+    LE_DEFINE_PARAMETERS(
+        Frequency,
+        HarmonicSlope,
+        FlangeIntensity,
+        FlangeOffset
     );
 
     /// \typedef Frequency

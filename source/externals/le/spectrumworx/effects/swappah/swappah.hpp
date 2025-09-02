@@ -50,14 +50,16 @@ struct Swappah
     typedef CommonParameters::Mode Mode;
     /// @}
 
-    LE_ENUMERATED_PARAMETER( BandOrder, ( LowHighMid )( MidLowHigh )( MidHighLow )( HighLowMid )( HighMidLow ) );
-    
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Mode        ) )
-        ( ( BandOrder   ) )
-        ( ( BandLowMid  )( LinearUnsignedInteger )( Minimum<0> )( Maximum<100> )( Default<33> )( Unit<' bw%'> ) )
-        ( ( BandMidHigh )( LinearUnsignedInteger )( Minimum<0> )( Maximum<100> )( Default<66> )( Unit<' bw%'> ) )
+    enum BandOrderValue { LowHighMid, MidLowHigh, MidHighLow, HighLowMid, HighMidLow };
+    class BandOrder : public LE::Parameters::EnumeratedParameter<5> {};
+    class BandLowMid : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<100>, Traits::Default<33>, Traits::Unit<' bw%'>> {};
+    class BandMidHigh : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<100>, Traits::Default<66>, Traits::Unit<' bw%'>> {};
+
+    LE_DEFINE_PARAMETERS(
+        Mode,
+        BandOrder,
+        BandLowMid,
+        BandMidHigh
     );
 
     /// \typedef Mode

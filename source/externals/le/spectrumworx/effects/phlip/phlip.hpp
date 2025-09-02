@@ -46,11 +46,11 @@ namespace Effects
 
 struct Phlip
 {
-    LE_ENUMERATED_PARAMETER( Mode, ( All )( Even )( Odd ) );
+    enum ModeValue { All, Even, Odd };
+    class Mode : public LE::Parameters::EnumeratedParameter<3> {};
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Mode ) )
+    LE_DEFINE_PARAMETERS(
+        Mode
     );
 
     /// \typedef Mode

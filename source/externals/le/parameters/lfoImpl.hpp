@@ -134,15 +134,19 @@ private:
     }; // struct PeriodScaleParameterTraits
 
 public:
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Enabled     ) ( LE::Parameters::Boolean ) )
-        ( ( PeriodScale ) )
-        ( ( Phase       ) ( Parameters::SymmetricFloat )( MaximumOffset<50> )( ValuesDenominator<100> ) )
-        ( ( LowerBound  ) ( Parameters::LinearFloat    )( Minimum<minimumValue> )( Maximum<maximumValue> )( Default<minimumValue> ) )
-        ( ( UpperBound  ) ( LowerBound                 )( Default<maximumValue> )/*...mrmlj...*/( ValuesDenominator<1> )( Unit<0> ) )
-        ( ( SyncTypes   ) )
-        ( ( Waveform    ) )
+    class Enabled : public LE::Parameters::Boolean {};
+    class Phase : public Parameters::SymmetricFloat::Modify<Parameters::Traits::MaximumOffset<50>, Parameters::Traits::ValuesDenominator<100>> {};
+    class LowerBound : public Parameters::LinearFloat::Modify<Parameters::Traits::Minimum<minimumValue>, Parameters::Traits::Maximum<maximumValue>, Parameters::Traits::Default<minimumValue>> {};
+    class UpperBound : public LowerBound::Modify<Parameters::Traits::Default<maximumValue>, Parameters::Traits::ValuesDenominator<1>, Parameters::Traits::Unit<0>> {};
+
+    LE_DEFINE_PARAMETERS(
+        Enabled,
+        PeriodScale,
+        Phase,
+        LowerBound,
+        UpperBound,
+        SyncTypes,
+        Waveform
     );
 
     Parameters       & parameters()       { return parameters_; }

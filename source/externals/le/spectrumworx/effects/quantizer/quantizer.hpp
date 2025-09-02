@@ -46,10 +46,12 @@ namespace Effects
 
 struct Quantizer
 {
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Width   )( LinearUnsignedInteger )( Minimum<0> )( Maximum<2000> )( Default<500> )( Unit<' Hz'> ) )
-        ( ( Origami )( LinearUnsignedInteger )( Minimum<0> )( Maximum< 100> )( Default<  0> )( Unit<' %'>  ) )
+    class Width : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<2000>, Traits::Default<500>, Traits::Unit<' Hz'>> {};
+    class Origami : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<100>, Traits::Default<0>, Traits::Unit<' %'> > {};
+
+    LE_DEFINE_PARAMETERS(
+        Width,
+        Origami
     );
 
     /// \typedef Width

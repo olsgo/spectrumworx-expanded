@@ -20,7 +20,7 @@
 #endif // LE_SW_AUTHORISATION_REQUIRED
 #include "le/math/math.hpp"
 #include "le/math/vector.hpp"
-#include "le/parameters/fusionAdaptors.hpp"
+
 #include "le/parameters/uiElements.hpp"
 #include "le/spectrumworx/presets.hpp"
 #include "le/utility/parentFromMember.hpp"

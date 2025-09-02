@@ -32,9 +32,10 @@ namespace Detail
 {
     struct BandGain
     {
-        LE_DEFINE_PARAMETERS
-        (
-            ( ( Attenuation )( LinearFloat )( Minimum<0> )( Maximum<60> )( Default<0> )( Unit<' dB'> ) )
+        class Attenuation : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<60>, Traits::Default<0>, Traits::Unit<' dB'>> {};
+
+        LE_DEFINE_PARAMETERS(
+            Attenuation
         );
 
         /// \typedef Attenuation

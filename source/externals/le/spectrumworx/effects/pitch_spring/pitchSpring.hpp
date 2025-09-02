@@ -39,11 +39,13 @@ namespace Detail
 
         typedef CommonParameters::SpringType SpringType;
 
-        LE_DEFINE_PARAMETERS
-        (
-            ( ( SpringType )                                                                                            )
-            ( ( Depth      ) ( LinearSignedInteger   )( Minimum< 0> )( Maximum< 2400> )( Default< 200> )( Unit<'\"' > ) )
-            ( ( Period     ) ( LinearUnsignedInteger )( Minimum<10> )( Maximum<10000> )( Default<1000> )( Unit<' ms'> ) )
+        class Depth : public LinearSignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<2400>, Traits::Default<200>, Traits::Unit<'"'>> {};
+        class Period : public LinearUnsignedInteger::Modify<Traits::Minimum<10>, Traits::Maximum<10000>, Traits::Default<1000>, Traits::Unit<' ms'>> {};
+
+        LE_DEFINE_PARAMETERS(
+            SpringType,
+            Depth,
+            Period
         );
 
         /// @}

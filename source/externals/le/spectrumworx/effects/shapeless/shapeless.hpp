@@ -43,9 +43,10 @@ namespace Effects
 
 struct Shapeless
 {
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Width )( LinearUnsignedInteger )( Minimum<0> )( Maximum<4000> )( Default< 200> )( Unit<' Hz'> ) )
+    class Width : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<4000>, Traits::Default<200>, Traits::Unit<' Hz'>> {};
+
+    LE_DEFINE_PARAMETERS(
+        Width
     );
 
     /// \typedef Width

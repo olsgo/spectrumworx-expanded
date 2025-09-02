@@ -45,12 +45,13 @@ namespace Effects
 
 struct Denoiser
 {
-    LE_ENUMERATED_PARAMETER( Mode, ( Main )( Side )( Sum ) );
+    enum ModeValue { Main, Side, Sum };
+    class Mode : public LE::Parameters::EnumeratedParameter<3> {};
+    class Intensity : public LinearUnsignedInteger::Modify<Traits::Minimum<1>, Traits::Maximum<100>, Traits::Default<5>, Traits::Unit<' %'> > {};
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Mode      ) )
-        ( ( Intensity ) ( LinearUnsignedInteger )( Minimum<1> )( Maximum<100> )( Default<5> )( Unit<' %'> ) )
+    LE_DEFINE_PARAMETERS(
+        Mode,
+        Intensity
     );
 
     /// \typedef Mode

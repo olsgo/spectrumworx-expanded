@@ -49,14 +49,16 @@ namespace Effects
 
 struct Shifter
 {
-    LE_ENUMERATED_PARAMETER( ShiftTarget, ( Magnitudes )( Phases )( Both     ) );
-    LE_ENUMERATED_PARAMETER( Tail       , ( Leave      )( Clear  )( Circular ) );
+    enum ShiftTargetValue { Magnitudes, Phases, Both };
+    class ShiftTarget : public LE::Parameters::EnumeratedParameter<3> {};
+    enum TailValue { Leave, Clear, Circular };
+    class Tail : public LE::Parameters::EnumeratedParameter<3> {};
+    class Offset : public SymmetricFloat::Modify<Traits::MaximumOffset<10>, Traits::Unit<' bw%'>> {};
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( ShiftTarget ) )
-        ( ( Offset      )( SymmetricFloat )( MaximumOffset<10> )( Unit<' bw%'> ) )
-        ( ( Tail        ) )
+    LE_DEFINE_PARAMETERS(
+        ShiftTarget,
+        Offset,
+        Tail
     );
     
     /// \typedef ShiftTarget

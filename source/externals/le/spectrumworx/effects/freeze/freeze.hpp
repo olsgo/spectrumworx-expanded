@@ -45,11 +45,14 @@ struct Freeze
     // Parameters
     ////////////////////////////////////////////////////////////////////////////
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( FreezeTrigger  )( TriggerParameter ) )
-        ( ( MeltTrigger    )( TriggerParameter ) )
-        ( ( TransitionTime )( LinearUnsignedInteger )( Minimum<0> )( Maximum<10000> )( Default<500> )( Unit<' ms'> ) )
+    class FreezeTrigger : public TriggerParameter {};
+    class MeltTrigger : public TriggerParameter {};
+    class TransitionTime : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<10000>, Traits::Default<500>, Traits::Unit<' ms'>> {};
+
+    LE_DEFINE_PARAMETERS(
+        FreezeTrigger,
+        MeltTrigger,
+        TransitionTime
     );
 
     /// \typedef FreezeTrigger

@@ -32,10 +32,10 @@ namespace Detail
 {
     struct ExImPloder ///<
     {
-        LE_DEFINE_PARAMETER( ( MagnitudeScale )( LinearUnsignedInteger )( Minimum<   1> )( Maximum<200> )( Default<  50> )( Unit<' s'   > ) );
-        LE_DEFINE_PARAMETER( ( Gliss          )( LinearSignedInteger   )( Minimum<-300> )( Maximum<300> )( Default<-100> )( Unit<' \"/s'> ) );
-        LE_DEFINE_PARAMETER( ( Threshold      )( LinearSignedInteger   )( Minimum<-120> )( Maximum<  0> )( Default<-120> )( Unit<' dB'  > ) );
-        LE_DEFINE_PARAMETER( ( Gate           )( Threshold             ) );
+        class MagnitudeScale : public LinearUnsignedInteger::Modify<Traits::Minimum<1>, Traits::Maximum<200>, Traits::Default<50>, Traits::Unit<' s'>> {};
+        class Gliss : public LinearSignedInteger::Modify<Traits::Minimum<-300>, Traits::Maximum<300>, Traits::Default<-100>, Traits::Unit<' "/s'>> {};
+        class Threshold : public LinearSignedInteger::Modify<Traits::Minimum<-120>, Traits::Maximum<0>, Traits::Default<-120>, Traits::Unit<' dB'>> {};
+        class Gate : public Threshold {};
 
         /// \typedef MagnitudeScale
         /// Used by all ExImploder effects which is only conveniently
@@ -72,15 +72,13 @@ struct PVImploder : Detail::ExImPloder
     typedef Detail::ExImPloder::Threshold Threshold;
     /// @}
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Decay     )( Detail::ExImPloder::MagnitudeScale ) )
-        ( ( Gliss     ) )
-        ( ( Threshold ) )
-        ( ( Gate      ) )
-        /// \note We use the same gating logic for both Exploder and Imploder.
-        ///                               (18.04.2013.) (Domagoj Saric)
-      //( ( Gate      )( Detail::ExImPloder::Gate )( Default<0> ) )
+    class Decay : public Detail::ExImPloder::MagnitudeScale {};
+
+    LE_DEFINE_PARAMETERS(
+        Decay,
+        Gliss,
+        Threshold,
+        Gate
     );
 
     /// \typedef Decay
@@ -138,12 +136,15 @@ struct PVExploder : Detail::ExImPloder
     typedef Detail::ExImPloder::Gate Gate;
     /// @}
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Growth    )( Detail::ExImPloder::MagnitudeScale )                  )
-        ( ( Gliss     )( Detail::ExImPloder::Gliss          )( Default< 100> ) )
-        ( ( Threshold )( Detail::ExImPloder::Threshold      )( Default<- 40> ) )
-        ( ( Gate      )                                                        )
+    class Growth : public Detail::ExImPloder::MagnitudeScale {};
+    class Gliss : public Detail::ExImPloder::Gliss::Modify<Traits::Default<100>> {};
+    class Threshold : public Detail::ExImPloder::Threshold::Modify<Traits::Default<-40>> {};
+
+    LE_DEFINE_PARAMETERS(
+        Growth,
+        Gliss,
+        Threshold,
+        Gate
     );
 
     /// \typedef Growth

@@ -47,10 +47,12 @@ namespace Effects
 
 struct TalkingWind
 {
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( EnvelopeBorder )( LinearUnsignedInteger )( Minimum<  0> )( Maximum<12000> )( Default<1000> )( Unit<' Hz'> ) )
-        ( ( EnvelopeGain   )( LinearFloat           )( Minimum<-10> )( Maximum<   10> )( Default<   0> )( Unit<' dB'> ) )
+    class EnvelopeBorder : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<12000>, Traits::Default<1000>, Traits::Unit<' Hz'>> {};
+    class EnvelopeGain : public LinearFloat::Modify<Traits::Minimum<-10>, Traits::Maximum<10>, Traits::Default<0>, Traits::Unit<' dB'>> {};
+
+    LE_DEFINE_PARAMETERS(
+        EnvelopeBorder,
+        EnvelopeGain
     );
 
 

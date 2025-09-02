@@ -26,7 +26,7 @@
 #include "le/math/constants.hpp"
 #include "le/math/math.hpp"
 #include "le/parameters/conversion.hpp"
-#include "le/parameters/fusionAdaptors.hpp"
+
 #include "le/parameters/uiElements.hpp"
 #include "le/parameters/parametersUtilities.hpp"
 #include "le/utility/countof.hpp"

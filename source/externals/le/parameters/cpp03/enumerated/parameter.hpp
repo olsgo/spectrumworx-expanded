@@ -97,33 +97,7 @@ public:
 ///
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifdef _MSC_VER
-#define LE_ENUMERATED_PARAMETER_WARNING_BEGIN() \
-    __pragma( warning( push )           )
-    __pragma( warning( disable : 4480 ) ) /* Nonstandard extension*/
 
-#define LE_ENUMERATED_PARAMETER_WARNING_END() \
-    __pragma( warning( pop ) )
-#else
-#define LE_ENUMERATED_PARAMETER_WARNING_BEGIN()
-#define LE_ENUMERATED_PARAMETER_WARNING_END()
-#endif // _MSC_VER
-
-#define LE_ENUMERATED_PARAMETER( parameterName, valueSequence )                             \
-    class parameterName                                                                     \
-        : public LE::Parameters::EnumeratedParameter<BOOST_PP_SEQ_SIZE( valueSequence )>    \
-    {                                                                                       \
-    private:                                                                                \
-        typedef EnumeratedBase Base;                                                        \
-    public:                                                                                 \
-        parameterName                                                                       \
-            ( type::param_type const initialValue = Base::default_() )                      \
-            : Base( initialValue ) {}                                                       \
-        LE_ENUMERATED_PARAMETER_WARNING_BEGIN()                                             \
-        enum value_type : /*std::*/uint_fast8_t { BOOST_PP_SEQ_ENUM( valueSequence ) };     \
-        LE_ENUMERATED_PARAMETER_WARNING_END()                                               \
-        operator value_type() const { return static_cast<value_type>( Base::getValue() ); } \
-    }
 
 //------------------------------------------------------------------------------
 } // namespace Parameters

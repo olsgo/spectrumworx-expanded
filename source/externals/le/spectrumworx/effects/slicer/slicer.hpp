@@ -44,13 +44,15 @@ namespace Effects
 
 struct Slicer
 {
-    LE_ENUMERATED_PARAMETER( Mode, ( Hold )( Silence )( Side ) );
+    enum ModeValue { Hold, Silence, Side };
+    class Mode : public LE::Parameters::EnumeratedParameter<3> {};
+    class TimeOn : public LinearUnsignedInteger::Modify<Traits::Minimum<10>, Traits::Maximum<1000>, Traits::Default<250>, Traits::Unit<' ms'>> {};
+    class TimeOff : public LinearUnsignedInteger::Modify<Traits::Minimum<10>, Traits::Maximum<1000>, Traits::Default<100>, Traits::Unit<' ms'>> {};
 
-    LE_DEFINE_PARAMETERS
-    (         
-        ( ( TimeOn  )( LinearUnsignedInteger )( Minimum<10> )( Maximum<1000> )( Default<250> )( Unit<' ms'> ) )    
-        ( ( TimeOff )( LinearUnsignedInteger )( Minimum<10> )( Maximum<1000> )( Default<100> )( Unit<' ms'> ) )
-        ( ( Mode    )                                                                                         )
+    LE_DEFINE_PARAMETERS(
+        TimeOn,
+        TimeOff,
+        Mode
     );
 
     /// \typedef TimeOn

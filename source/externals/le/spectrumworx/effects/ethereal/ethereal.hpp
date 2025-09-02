@@ -51,13 +51,14 @@ struct Ethereal
     typedef CommonParameters::Mode Mode;
     /// @}
 
-    LE_ENUMERATED_PARAMETER( Condition, ( DiffHigher )( DiffLower ) );
+    enum ConditionValue { DiffHigher, DiffLower };
+    class Condition : public LE::Parameters::EnumeratedParameter<2> {};
+    class Threshold : public SymmetricFloat::Modify<Traits::MaximumOffset<30>, Traits::Unit<' dB'>> {};
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Condition ) )
-        ( ( Threshold )( SymmetricFloat )( MaximumOffset<30> )( Unit<' dB'> ) )        
-        ( ( Mode      ) )
+    LE_DEFINE_PARAMETERS(
+        Condition,
+        Threshold,
+        Mode
     );
 
     /// \typedef Condition

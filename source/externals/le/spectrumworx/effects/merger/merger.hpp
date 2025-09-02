@@ -45,12 +45,13 @@ namespace Effects
 
 struct Merger
 {
-    LE_ENUMERATED_PARAMETER( Operation, ( MainLargerThanSide )( SideLargerThanMain )( MainAboveThreshold )( SideAboveThreshold )( MainBelowThreshold )( SideBelowThreshold ) );
+    enum OperationValue { MainLargerThanSide, SideLargerThanMain, MainAboveThreshold, SideAboveThreshold, MainBelowThreshold, SideBelowThreshold };
+    class Operation : public LE::Parameters::EnumeratedParameter<6> {};
+    class Threshold : public LinearFloat::Modify<Traits::Minimum<-120>, Traits::Maximum<0>, Traits::Default<-20>, Traits::Unit<' dB'>> {};
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Operation ) )
-        ( ( Threshold )( LinearFloat )( Minimum<-120> )( Maximum<0> )( Default<-20> )( Unit<' dB'> ) )
+    LE_DEFINE_PARAMETERS(
+        Operation,
+        Threshold
     );
 
     /// \typedef Operation

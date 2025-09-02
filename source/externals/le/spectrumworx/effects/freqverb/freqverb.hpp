@@ -49,12 +49,17 @@ namespace Effects
 
 struct Freqverb
 {
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Time60dB     )( LinearFloat           )( Minimum      <100> )( Maximum<20000> )( Default<2500> )( ValuesDenominator<1000> )( Unit<' s'   > ) )
-        ( ( RoomSize     )( LinearFloat           )( Minimum      <-24> )( Maximum<    0> )( Default<  -3> )                           ( Unit<' dB'  > ) )
-        ( ( ReverbPitch  )( SymmetricFloat        )( MaximumOffset< 48> )                                                              ( Unit<' \'/s'> ) )
-		( ( HFAbsorption )( LinearUnsignedInteger )( Minimum      <  0> )( Maximum<  100> )( Default<   5> )                           ( Unit<' %'>    ) )
+    class Time60dB : public LinearFloat::Modify<Traits::Minimum<100>, Traits::Maximum<20000>, Traits::Default<2500>, Traits::ValuesDenominator<1000>, Traits::Unit<' s'>> {};
+    class RoomSize : public LinearFloat::Modify<Traits::Minimum<-24>, Traits::Maximum<0>, Traits::Default<-3>, Traits::Unit<' dB'>> {};
+    class ReverbPitch : public SymmetricFloat::Modify<Traits::MaximumOffset<48>, Traits::Unit<' 
+/s'>> {};
+    class HFAbsorption : public LinearUnsignedInteger::Modify<Traits::Minimum<0>, Traits::Maximum<100>, Traits::Default<5>, Traits::Unit<' %'> > {};
+
+    LE_DEFINE_PARAMETERS(
+        Time60dB,
+        RoomSize,
+        ReverbPitch,
+        HFAbsorption
     );
 
     /// \typedef Time60dB

@@ -53,12 +53,15 @@ struct Inserter
     typedef CommonParameters::Mode Mode;
     /// @}
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Mode        ) )
-        ( ( Source      )( LinearFloat )( Minimum<0> )( Maximum<100> )( Default<0> )( Unit<' bw%'> ) )
-        ( ( Destination )( LinearFloat )( Minimum<0> )( Maximum<100> )( Default<0> )( Unit<' bw%'> ) )
-        ( ( InsertSize  )( LinearFloat )( Minimum<0> )( Maximum<100> )( Default<5> )( Unit<' bw%'> ) )
+    class Source : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<100>, Traits::Default<0>, Traits::Unit<' bw%'>> {};
+    class Destination : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<100>, Traits::Default<0>, Traits::Unit<' bw%'>> {};
+    class InsertSize : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<100>, Traits::Default<5>, Traits::Unit<' bw%'>> {};
+
+    LE_DEFINE_PARAMETERS(
+        Mode,
+        Source,
+        Destination,
+        InsertSize
     );
 
     /// \typedef Mode

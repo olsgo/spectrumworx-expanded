@@ -32,10 +32,10 @@ namespace Detail
 {
     struct TonalBase ///<
     {
-        LE_DEFINE_PARAMETER( ( Strength        )( LinearFloat )( Minimum< 0> )( Maximum< 90> )( Default<15> )( Unit<' dB'> ) );
-        LE_DEFINE_PARAMETER( ( GlobalThreshold )( LinearFloat )( Minimum<10> )( Maximum<120> )( Default<30> )( Unit<' dB'> ) );
-        LE_DEFINE_PARAMETER( ( LocalThreshold  )( LinearFloat )( Minimum< 0> )( Maximum<120> )( Default<10> )( Unit<' dB'> ) );
-        LE_DEFINE_PARAMETER( ( Attenuation     )( LinearFloat )( Minimum< 0> )( Maximum< 60> )( Default<20> )( Unit<' dB'> ) );
+        class Strength : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<90>, Traits::Default<15>, Traits::Unit<' dB'>> {};
+        class GlobalThreshold : public LinearFloat::Modify<Traits::Minimum<10>, Traits::Maximum<120>, Traits::Default<30>, Traits::Unit<' dB'>> {};
+        class LocalThreshold : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<120>, Traits::Default<10>, Traits::Unit<' dB'>> {};
+        class Attenuation : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<60>, Traits::Default<20>, Traits::Unit<' dB'>> {};
 
         /// \typedef Strength
         /// \brief How strong the peak must be to be considered tonal.
@@ -71,12 +71,11 @@ namespace Detail
 
 struct Tonal : Detail::TonalBase
 {
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Strength        ) )
-        ( ( GlobalThreshold ) )
-        ( ( LocalThreshold  ) )
-        ( ( Attenuation     ) )
+    LE_DEFINE_PARAMETERS(
+        Strength,
+        GlobalThreshold,
+        LocalThreshold,
+        Attenuation
     );
 
     static char const title      [];
@@ -103,12 +102,15 @@ struct Atonal : Detail::TonalBase
     typedef Detail::TonalBase::LocalThreshold LocalThreshold;
     /// @}
 
-    LE_DEFINE_PARAMETERS
-    (
-        ( ( Strength        )( Detail::TonalBase::Strength        )( Default< 0> )( ValuesDenominator<1> ) )
-        ( ( GlobalThreshold )( Detail::TonalBase::GlobalThreshold )( Default<60> )( ValuesDenominator<1> ) )
-        ( ( LocalThreshold  ) )
-        ( ( Attenuation     )( Detail::TonalBase::Attenuation     )( Default<30> )( ValuesDenominator<1> ) )
+    class Strength : public Detail::TonalBase::Strength::Modify<Traits::Default<0>, Traits::ValuesDenominator<1>> {};
+    class GlobalThreshold : public Detail::TonalBase::GlobalThreshold::Modify<Traits::Default<60>, Traits::ValuesDenominator<1>> {};
+    class Attenuation : public Detail::TonalBase::Attenuation::Modify<Traits::Default<30>, Traits::ValuesDenominator<1>> {};
+
+    LE_DEFINE_PARAMETERS(
+        Strength,
+        GlobalThreshold,
+        LocalThreshold,
+        Attenuation
     );
 
     /// \typedef Strength

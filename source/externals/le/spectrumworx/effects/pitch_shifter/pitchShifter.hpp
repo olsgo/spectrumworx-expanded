@@ -32,18 +32,22 @@ namespace Detail
 {
     struct PitchShifterBase
     {
-    #ifdef LE_PV_USE_TSS
-        #define LE_PV_TSS_SENSITIVITY() ( ( TSSSensitivity )( LinearFloat )( Minimum<0> )( Default<65> )( Maximum<100> )( Unit<'%'> ) )
-    #else
-        #define LE_PV_TSS_SENSITIVITY()
-    #endif // LE_PV_USE_TSS
-
-        LE_DEFINE_PARAMETERS
-        (
-            ( ( SemiTones )( SymmetricFloat   )( MaximumOffset< 24> )( Unit<'\'' >  ) )
-            ( ( Cents     )( SymmetricInteger )( MaximumOffset<100> )( Unit<'\'\''> ) )
-            LE_PV_TSS_SENSITIVITY()
-        );
+    class SemiTones : public SymmetricFloat::Modify<Traits::MaximumOffset<24>, Traits::Unit<'''> > {};
+        class Cents : public SymmetricInteger::Modify<Traits::MaximumOffset<100>, Traits::Unit<''''>> {};
+#ifdef LE_PV_USE_TSS
+        class TSSSensitivity : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Default<65>, Traits::Maximum<100>, Traits::Unit<'%'> > {};
+        LE_DEFINE_PARAMETERS(
+            SemiTones,
+            Cents,
+            TSSSensitivity
+        )
+#else
+        LE_DEFINE_PARAMETERS(
+            SemiTones,
+            Cents
+        )
+#endif // LE_PV_USE_TSS
+;
 
         #undef LE_PV_TSS_SENSITIVITY
 

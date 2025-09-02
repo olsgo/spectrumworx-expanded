@@ -32,9 +32,11 @@ namespace Detail
 {
     struct PitchFollowerBase
     {
-        LE_DEFINE_PARAMETERS
-        (
-            ( ( Speed )( LinearFloat )( Minimum< 0> )( Maximum<60> )( Default< 1> )( Unit<' \'/s'> ) )
+        class Speed : public LinearFloat::Modify<Traits::Minimum<0>, Traits::Maximum<60>, Traits::Default<1>, Traits::Unit<' 
+'/s>> {};
+
+        LE_DEFINE_PARAMETERS(
+            Speed
         );
 
         /// \typedef Speed
